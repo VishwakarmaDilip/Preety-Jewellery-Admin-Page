@@ -5,7 +5,7 @@ const Input = ({ type, className, placeholder }) => {
     <input
       type={type}
       placeholder={placeholder}
-      className={`${className} bg-gray-200 rounded-lg h-9`}
+      className={`${className} bg-gray-100 rounded-lg h-9`}
     />
   );
 };
