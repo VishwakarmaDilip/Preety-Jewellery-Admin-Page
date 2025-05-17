@@ -1,11 +1,15 @@
 import React from "react";
 
-const Input = ({ type, className, placeholder }) => {
+const Input = ({ type, className, placeholder, accept, id, onChange, ...props }) => {
   return (
     <input
+      id={id}
       type={type}
-      placeholder={placeholder}
-      className={`${className} bg-gray-100 rounded-lg h-9`}
+      placeholder={placeholder ? placeholder : ""}
+      accept={type === "file" ? accept : ""}
+      onChange={onChange ? onChange : null}
+      className={`${className} bg-gray-100 rounded-lg h-9 px-2`}
+      {...props}
     />
   );
 };

@@ -74,17 +74,17 @@ const Home = () => {
           <h2 className="text-xl font-bold mt-2">Recent Order</h2>
           <div className="bg-white rounded-lg overflow-hidden mx-5 my-2 mt-5">
             {/* Heading */}
-            <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-5">
+            <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-7">
               <li>
                 <p>Order No.</p>
               </li>
               <li>
                 <p>Amount</p>
               </li>
-              <li>
+              <li className="col-start-3 col-end-5">
                 <p>Order Time</p>
               </li>
-              <li>
+              <li className="col-start-5 col-end-7">
                 <p>Customer Name</p>
               </li>
               <li>
@@ -96,7 +96,7 @@ const Home = () => {
             {testArray.map((e) => {
               return (
                 <ul
-                  className="grid grid-cols-5 px-6 py-3 pl-6 border-b border-gray-200"
+                  className="grid grid-cols-7 px-6 py-3 pl-6 border-b border-gray-200"
                   key={e}
                 >
                   <li>
@@ -105,10 +105,10 @@ const Home = () => {
                   <li>
                     <p>₹450</p>
                   </li>
-                  <li>
+                  <li className="col-start-3 col-end-5">
                     <p>27 Apr 2025, 03:30 PM</p>
                   </li>
-                  <li>
+                  <li className="col-start-5 col-end-7">
                     <p>Ajay Sahu</p>
                   </li>
                   <li>
