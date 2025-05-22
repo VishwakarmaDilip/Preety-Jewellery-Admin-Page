@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import Input from "./Input";
 import Button from "./Button";
 
-const AddProduct = () => {
+const AddProduct = ({ toggleAddPage }) => {
   const {
     register,
     handleSubmit,
@@ -43,18 +43,17 @@ const AddProduct = () => {
     formData.append("category", data.category);
     formData.append("price", data.price);
     formData.append("quantity", data.quantity);
-    formData.append("images", imagePreviews );
+    formData.append("images", imagePreviews);
 
     // console.log(data);
-    console.log(formData.getAll("images"));
-    
+    // console.log(formData.getAll("images"));
   };
   return (
     <div className="bg-[#F4F2F2] h-full w-6/7 absolute right-0">
       {/* navigation */}
       <nav className="bg-gray-200 flex justify-between p-5 ">
         <h2 className="font-bold text-lg">Add Product</h2>
-        <Icon.X />
+        <Icon.X onClick={toggleAddPage} />
       </nav>
       <form className="h-full" onSubmit={handleSubmit(onSubmit)}>
         <div className="h-4/5 overflow-y-scroll">
@@ -190,6 +189,8 @@ const AddProduct = () => {
         {/* Buttons */}
         <div className="flex gap-10 p-4 px-20">
           <Button
+            type="button"
+            onClick={toggleAddPage}
             className="bg-white w-xl hover:bg-gray-200 active:bg-gray-300"
             textColor={true}
           >

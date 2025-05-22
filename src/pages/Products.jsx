@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "../components/Button";
 import * as Icon from "react-feather";
 import Input from "../components/Input";
 import { useForm } from "react-hook-form";
 import AddProduct from "../components/AddProduct";
+import { sharedContext } from "../components/Layout";
+
 
 const Products = () => {
   const { register, handleSubmit } = useForm();
+  const [AddProductPage, setAddProductPage] = useState(false);
+
+  const {sidebar} = useContext(sharedContext);
 
   const onSubmit = (data) => {
     console.log(data);
@@ -23,6 +28,11 @@ const Products = () => {
       selected: false,
     }))
   );
+
+  const toggleAddPage = () => {
+    window.scrollTo(0, 0);
+    setAddProductPage(!AddProductPage);
+  };
 
   // State: Select All checkbox
   const [selectAll, setSelectAll] = useState(false);
@@ -43,16 +53,19 @@ const Products = () => {
     setSelectAll(updatedProducts.every((p) => p.selected));
   };
 
-  document.body.style.overflow="hidden"
+  document.body.style.overflow = AddProductPage ? "hidden" : "auto";
 
   return (
     <div className="px-8 py-3">
-      
       <h1 className="font-bold text-2xl">Products</h1>
 
       {/* add product form */}
-      <div className="absolute bg-[#12111150] w-full h-full z-10 top-0 left-0">
-        <AddProduct/>
+      <div
+        className={`${
+          AddProductPage ? "absolute" : "hidden"
+        } bg-[#12111150] w-full h-full z-10 top-0 left-0`}
+      >
+        <AddProduct toggleAddPage={toggleAddPage} />
       </div>
       <div className="p-5 flex flex-col gap-8">
         {/* quick action */}
@@ -61,7 +74,10 @@ const Products = () => {
             <Button className="bg-rose-700 hover:bg-rose-800 active:bg-rose-900">
               Delete In Bulk
             </Button>
-            <Button className="bg-green-500 hover:bg-green-600 active:bg-green-700 flex">
+            <Button
+              onClick={() => toggleAddPage()}
+              className="bg-green-500 hover:bg-green-600 active:bg-green-700 flex"
+            >
               <Icon.Plus />
               Add Products
             </Button>
@@ -76,16 +92,16 @@ const Products = () => {
               <Icon.Search size={20} className="absolute top-2 left-1.5" />
               <Input
                 type="search"
-                className="md:w-96 pl-9 pr-1.5"
+                className={`${sidebar ? "md:w-60" : "md:w-94"} h-10 pl-9 pr-1.5 transition-all ease-in-out`}
                 placeholder="Search Product..."
               />
             </div>
 
             <form className="flex gap-14" onSubmit={handleSubmit(onSubmit)}>
-              <div className="flex gap-8">
+              <div className="flex gap-6">
                 <div className="relative">
                   <select
-                    className="appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-60"
+                    className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${sidebar ? "md:w-56" : "md:w-60"} transition-all ease-in-out`}
                     {...register("Category")}
                   >
                     <option>Category</option>
