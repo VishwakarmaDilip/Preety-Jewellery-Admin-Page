@@ -5,6 +5,7 @@ import Input from "../components/Input";
 import { useForm } from "react-hook-form";
 import AddProduct from "../components/AddProduct";
 import { sharedContext } from "../components/Layout";
+import { NavLink } from "react-router-dom";
 
 
 const Products = () => {
@@ -206,7 +207,9 @@ const Products = () => {
                   <p>{product.stock}</p>
                 </li>
                 <li>
+                  <NavLink to={`/products/${product.id}`}>
                   <Icon.Eye size={20} />
+                  </NavLink>
                 </li>
                 <li className="flex gap-3">
                   <Icon.Edit size={20} />
