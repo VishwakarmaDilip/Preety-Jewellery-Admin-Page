@@ -2,12 +2,25 @@ import React, { useContext } from "react";
 import * as Icon from "react-feather";
 import { sharedContext } from "./Layout";
 import Button from "./Button";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const { sidebar, setSidebar } = useContext(sharedContext);
+  const navigate = useNavigate();
   const handleSidebar = () => {
     setSidebar(!sidebar);
+  };
+  const handleLogout = () => {
+    try {
+      fetch(`http://localhost:3000/api/v1/owner/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      navigate("/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+;
   };
   return (
     <div
@@ -62,6 +75,7 @@ const Sidebar = () => {
           className={
             "bg-rose-700 hover:bg-rose-800 active:bg-rose-900 flex mt-5"
           }
+          onClick={handleLogout}
         >
           <Icon.LogOut className="mr-2" />
           Logout

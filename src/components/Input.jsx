@@ -1,6 +1,6 @@
 import React from "react";
 
-const Input = ({ type, className, placeholder, accept, id, onChange, ...props }) => {
+const Input = ({ type, className, placeholder, accept, id, onChange, bgColor, ...props }) => {
   return (
     <input
       id={id}
@@ -8,7 +8,7 @@ const Input = ({ type, className, placeholder, accept, id, onChange, ...props })
       placeholder={placeholder ? placeholder : ""}
       accept={type === "file" ? accept : ""}
       onChange={onChange ? onChange : null}
-      className={`${className} bg-gray-100 rounded-lg h-9 px-2`}
+      className={`${className} ${bgColor ? bgColor:"bg-gray-100"} rounded-lg h-9 px-2`}
       {...props}
     />
   );

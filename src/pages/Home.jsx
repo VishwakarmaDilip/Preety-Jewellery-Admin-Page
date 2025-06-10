@@ -1,8 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AnalyticCard from "../components/AnalyticCard";
 
 const Home = () => {
   const testArray = [1, 2, 3, 4, 5, 6, 7];
+
+  // useEffect(() => {
+  //   const fetchData = async() => {
+  //     try {
+  //       const response = await fetch(`http://localhost:3000/api/v1/owner/getOwner`,{
+  //         method: "GET",
+  //         credentials: "include",
+  //       })
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);  
+  //     }
+  //   }
+
+  
+  // }, [])
+  
   return (
     <div className="px-8 py-3">
       {/* Page title */}

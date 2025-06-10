@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Button from "../components/Button";
 import * as Icon from "react-feather";
 import Input from "../components/Input";
@@ -6,29 +6,90 @@ import { useForm } from "react-hook-form";
 import AddProduct from "../components/AddProduct";
 import { sharedContext } from "../components/Layout";
 import { NavLink } from "react-router-dom";
-
+import toast from "react-hot-toast";
 
 const Products = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const [AddProductPage, setAddProductPage] = useState(false);
+  const { sidebar } = useContext(sharedContext);
+  const [products, setProducts] = useState([]);
+  const [category, setCategory] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const {sidebar} = useContext(sharedContext);
+  // Fetch products from the API
+  useEffect(() => {
+    const callApi = setTimeout(() => {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+
+          const responseData = await response.json();
+          const allProducts = responseData.data.fetchedProduct;
+
+          setProducts(allProducts);
+        } catch (error) {
+          console.log("Error fetching products:", error);
+        }
+      };
+
+      fetchData();
+    }, 700);
+
+    return () => clearTimeout(callApi);
+  }, [searchTerm]);
+
+  // Fetch categories from the API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/v1/product/category/getCategories`,
+          {
+            credentials: "include",
+          }
+        );
+
+        const responseData = await response.json();
+        const allCategories = responseData.data;
+
+        setCategory(allCategories);
+      } catch (error) {
+        console.log("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const onSubmit = (data) => {
     console.log(data);
   };
 
-  // State: Products with `selected` property
-  const [products, setProducts] = useState(
-    [1, 2, 3, 4, 5, 6, 7].map((id) => ({
-      id,
-      name: "Gold Bird",
-      category: "Ear Ring",
-      price: 450,
-      stock: 60,
-      selected: false,
-    }))
-  );
+  const handleDeleteProduct = async (id) => {
+    confirm("Are you sure you want to delete this product?") &&
+      fetch(`http://localhost:3000/api/v1/product/deleteProduct/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      })
+        .then((response) => {
+          if (response.ok) {
+            setProducts(products.filter((product) => product._id !== id));
+            toast.success("Product deleted successfully");
+          } else {
+            toast.error("Failed to delete product");
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting product:", error);
+          toast.error("An error occurred while deleting the product");
+        });
+  }
 
   const toggleAddPage = () => {
     window.scrollTo(0, 0);
@@ -47,8 +108,8 @@ const Products = () => {
   };
 
   const handleSelectItem = (id) => {
-    const updatedProducts = products.map((product) =>
-      product.id === id ? { ...product, selected: !product.selected } : product
+    const updatedProducts = products?.map((product) =>
+      product._id === id ? { ...product, selected: !product.selected } : product
     );
     setProducts(updatedProducts);
     setSelectAll(updatedProducts.every((p) => p.selected));
@@ -93,7 +154,11 @@ const Products = () => {
               <Icon.Search size={20} className="absolute top-2 left-1.5" />
               <Input
                 type="search"
-                className={`${sidebar ? "md:w-60" : "md:w-94"} h-10 pl-9 pr-1.5 transition-all ease-in-out`}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+                className={`${
+                  sidebar ? "md:w-60" : "md:w-94"
+                } h-10 pl-9 pr-1.5 transition-all ease-in-out`}
                 placeholder="Search Product..."
               />
             </div>
@@ -102,13 +167,17 @@ const Products = () => {
               <div className="flex gap-6">
                 <div className="relative">
                   <select
-                    className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${sidebar ? "md:w-56" : "md:w-60"} transition-all ease-in-out`}
+                    className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
+                      sidebar ? "md:w-56" : "md:w-60"
+                    } transition-all ease-in-out`}
                     {...register("Category")}
                   >
-                    <option>Category</option>
-                    <option value="earRing">Ear Ring</option>
-                    <option value="bangle">Bangle</option>
-                    <option value="neckless">Neckless</option>
+                    <option value="">Category</option>
+                    {category?.map((cat) => (
+                      <option key={cat?._id} value={cat?._id}>
+                        {cat?.categoryName}
+                      </option>
+                    ))}
                   </select>
                   <Icon.Triangle
                     fill=""
@@ -122,10 +191,9 @@ const Products = () => {
                     className="appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-60"
                     {...register("Short")}
                   >
-                    <option>Short</option>
-                    <option value="earRing">Ear Ring</option>
-                    <option value="bangle">Bangle</option>
-                    <option value="neckless">Neckless</option>
+                    <option value="">Short</option>
+                    <option value="Price Low to High">Price Low to High</option>
+                    <option value="Price High to Low">Price High to Low</option>
                   </select>
                   <Icon.Triangle
                     fill=""
@@ -139,7 +207,15 @@ const Products = () => {
                 <Button type="submit" className="bg-violet-700 w-40">
                   Filter
                 </Button>
-                <Button className="bg-red-600 w-40">Reset</Button>
+                <Button
+                  onClick={() => {
+                    setSearchTerm("");
+                    reset();
+                  }}
+                  className="bg-red-600 w-40"
+                >
+                  Reset
+                </Button>
               </div>
             </form>
           </div>
@@ -177,46 +253,54 @@ const Products = () => {
             </ul>
 
             {/* Product rows */}
-            {products.map((product) => (
-              <ul
-                className="grid grid-cols-8 px-6 py-3 border-b border-gray-200"
-                key={product.id}
-              >
-                <li className="flex gap-2 items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={product.selected}
-                    onChange={() => handleSelectItem(product.id)}
-                    className=" cursor-pointer"
-                  />
-                  <p onClick={() => handleSelectItem(product.id)}>
-                    {product.id.toString().padStart(6, "0")}
-                  </p>
-                </li>
-                <li className="col-start-2 col-end-4 flex items-center gap-3">
-                  <Icon.Image size={15} />
-                  <p>{product.name}</p>
-                </li>
-                <li>
-                  <p>{product.category}</p>
-                </li>
-                <li>
-                  <p>₹{product.price}</p>
-                </li>
-                <li>
-                  <p>{product.stock}</p>
-                </li>
-                <li>
-                  <NavLink to={`/products/${product.id}`}>
-                  <Icon.Eye size={20} />
-                  </NavLink>
-                </li>
-                <li className="flex gap-3">
-                  <Icon.Edit size={20} />
-                  <Icon.Trash2 size={20} />
-                </li>
-              </ul>
-            ))}
+            {products?.length > 0 ? (
+              products?.map((product) => (
+                <ul
+                  className="grid grid-cols-8 px-6 py-3 border-b border-gray-200"
+                  key={product?._id}
+                >
+                  <li className="flex gap-2 items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={product?.selected}
+                      onChange={() => handleSelectItem(product?._id)}
+                      className=" cursor-pointer"
+                    />
+                    <p onClick={() => handleSelectItem(product?._id)}>
+                      {product?.productId}
+                    </p>
+                  </li>
+                  <li className="col-start-2 col-end-4 flex items-center gap-3">
+                    <img src={product?.image[0]} alt="" className="h-5 w-5" />
+                    <p>{product?.productName}</p>
+                  </li>
+                  <li>
+                    <p>{product?.category[0]?.categoryName}</p>
+                  </li>
+                  <li>
+                    <p>₹{product?.price}</p>
+                  </li>
+                  <li>
+                    <p>{product?.quantity}</p>
+                  </li>
+                  <li>
+                    <NavLink to={`/products/${product?._id}`}>
+                      <Icon.Eye size={20} />
+                    </NavLink>
+                  </li>
+                  <li className="flex gap-3 cursor-pointer">
+                    <Icon.Edit size={20} className="hover:text-green-500" />
+                    <Icon.Trash2 size={20}
+                    onClick={()=>handleDeleteProduct(product?._id)}
+                    className="hover:text-red-600" />
+                  </li>
+                </ul>
+              ))
+            ) : (
+              <div className="text-center py-5">
+                <p className="text-gray-500">No products found</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
