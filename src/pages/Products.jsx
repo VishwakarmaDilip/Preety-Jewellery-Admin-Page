@@ -15,14 +15,27 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [refresh, setRefresh] = useState(false);
+  const [pageInfo, setPageInfo] = useState({});
+  const [pageNumber, setPageNumber] = useState(1);
+  const [changePage, setChangePage] = useState(false);
 
   // Fetch products from the API
   useEffect(() => {
+    let page;
+    if (searchTerm === "") {
+      page = pageNumber;
+    } else {
+      page = 1; // Reset to page 1 if search term is not empty
+    }
+    const delay = changePage ? 0 : 700; // Delay for debounce effect
     const callApi = setTimeout(() => {
       const fetchData = async () => {
         try {
+          console.log(pageNumber);
+
           const response = await fetch(
-            `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}`,
+            `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}&page=${page}`,
             {
               method: "GET",
               credentials: "include",
@@ -31,18 +44,22 @@ const Products = () => {
 
           const responseData = await response.json();
           const allProducts = responseData.data.fetchedProduct;
+          const pageData = responseData.data.pageInfo;
 
           setProducts(allProducts);
+          setPageInfo(pageData);
+          console.log(responseData);
         } catch (error) {
           console.log("Error fetching products:", error);
         }
       };
 
       fetchData();
-    }, 700);
+      setChangePage(false);
+    }, delay);
 
     return () => clearTimeout(callApi);
-  }, [searchTerm]);
+  }, [searchTerm, refresh, pageNumber]);
 
   // Fetch categories from the API
   useEffect(() => {
@@ -88,8 +105,10 @@ const Products = () => {
         .catch((error) => {
           console.error("Error deleting product:", error);
           toast.error("An error occurred while deleting the product");
+        }).finally(() => {
+          setRefresh(!refresh);
         });
-  }
+  };
 
   const toggleAddPage = () => {
     window.scrollTo(0, 0);
@@ -127,7 +146,7 @@ const Products = () => {
           AddProductPage ? "absolute" : "hidden"
         } bg-[#12111150] w-full h-full z-10 top-0 left-0`}
       >
-        <AddProduct toggleAddPage={toggleAddPage} />
+        <AddProduct toggleAddPage={toggleAddPage} setRefresh={setRefresh} />
       </div>
       <div className="p-5 flex flex-col gap-8">
         {/* quick action */}
@@ -194,6 +213,7 @@ const Products = () => {
                     <option value="">Short</option>
                     <option value="Price Low to High">Price Low to High</option>
                     <option value="Price High to Low">Price High to Low</option>
+                    <option value="createdAt">createdAt</option>
                   </select>
                   <Icon.Triangle
                     fill=""
@@ -290,15 +310,67 @@ const Products = () => {
                   </li>
                   <li className="flex gap-3 cursor-pointer">
                     <Icon.Edit size={20} className="hover:text-green-500" />
-                    <Icon.Trash2 size={20}
-                    onClick={()=>handleDeleteProduct(product?._id)}
-                    className="hover:text-red-600" />
+                    <Icon.Trash2
+                      size={20}
+                      onClick={() => handleDeleteProduct(product?._id)}
+                      className="hover:text-red-600"
+                    />
                   </li>
                 </ul>
               ))
             ) : (
               <div className="text-center py-5">
                 <p className="text-gray-500">No products found</p>
+              </div>
+            )}
+
+            {products?.length > 0 && (
+              <div className="bg-gray-200 px-6 py-3 flex items-center justify-between text-sm font-medium">
+                {/* Left: Showing results info */}
+                <p className="text-gray-700">
+                  Showing page{" "}
+                  <span className="text-gray-900">{pageInfo?.page}</span> of{" "}
+                  <span className="text-gray-900">{pageInfo?.totalPages}</span>{" "}
+                  pages (
+                  <span className="text-gray-900">
+                    {pageInfo?.totalProduct}
+                  </span>{" "}
+                  Products)
+                </p>
+
+                {/* Right: Prev / Next buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setPageNumber(pageInfo.page - 1);
+                      setChangePage(true);
+                    }}
+                    disabled={pageInfo.page === 1}
+                    className={`px-3 py-1 rounded ${
+                      pageInfo.page === 1
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-white hover:bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    Prev
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPageNumber(pageInfo.page + 1);
+                      console.log("Next Page:", pageInfo.page + 1);
+
+                      setChangePage(true);
+                    }}
+                    disabled={pageInfo.page === pageInfo.totalPages}
+                    className={`px-3 py-1 rounded ${
+                      pageInfo.page === pageInfo.totalPages
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-white hover:bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </div>

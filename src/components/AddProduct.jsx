@@ -1,24 +1,86 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as Icon from "react-feather";
 import { useForm } from "react-hook-form";
 import Input from "./Input";
 import Button from "./Button";
+import toast from "react-hot-toast";
 
-const AddProduct = ({ toggleAddPage }) => {
+const AddProduct = ({ toggleAddPage, setRefresh }) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
-
   const [imagePreviews, setImagePreviews] = React.useState([]);
+  const [category, setCategory] = React.useState([]);
+  const [newCategory, setNewCategory] = React.useState("");
+  const [selectedFiles, setSelectedFiles] = React.useState([]);
+  const [adding, setAdding] = React.useState(false);
+
+  // Fetch categories from the API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/v1/product/category/getCategories`,
+          {
+            credentials: "include",
+          }
+        );
+
+        const responseData = await response.json();
+        const allCategories = responseData.data;
+
+        setCategory(allCategories);
+      } catch (error) {
+        console.log("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const creatCategory = async (category) => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/v1/product/category/createCategory",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ category }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create category");
+      }
+
+      const data = await response.json();
+      // Optionally update category list or show success message
+      // console.log(data.data);
+
+      setCategory((prev) => [...prev, data.data]);
+      setNewCategory("");
+      toast.success(`Now You can Choose ${data?.data?.categoryName} Category`);
+    } catch (error) {
+      console.error("Error creating category:", error);
+    }
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+
+    // Store file previews
     const imageURL = files.map((file) => URL.createObjectURL(file));
     const previews = [...imagePreviews, ...imageURL];
-    setImagePreviews(previews);
+    setImagePreviews((prev) => [...prev, ...imageURL]);
+
+    // Store actual files for submission
+    setSelectedFiles((prev) => [...prev, ...files]);
   };
 
   const handleRemoveImage = (index) => {
@@ -29,6 +91,8 @@ const AddProduct = ({ toggleAddPage }) => {
       // Remove the image at the specified index
       return prev.filter((_, i) => i !== index);
     });
+
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = (data) => {
@@ -38,15 +102,43 @@ const AddProduct = ({ toggleAddPage }) => {
     }
 
     const formData = new FormData();
-    formData.append("name", data.name);
+    formData.append("productName", data.productName);
     formData.append("description", data.description);
     formData.append("category", data.category);
     formData.append("price", data.price);
     formData.append("quantity", data.quantity);
-    formData.append("images", imagePreviews);
 
-    // console.log(data);
-    // console.log(formData.getAll("images"));
+    selectedFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    // console.log(data, imagePreviews);
+    setAdding(true);
+    fetch("http://localhost:3000/api/v1/product/createProduct", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to add product");
+        }
+        toast.success("Product added successfully");
+        reset();
+        setImagePreviews([]);
+        toggleAddPage();
+        setRefresh((prev) => !prev); // Trigger refresh in parent component
+        setSelectedFiles([]);
+        return response.json();
+      })
+      .catch((error) => {
+        console.error("Error adding product:", error);
+        toast.error("Failed to add product");
+      })
+      .finally(() => {
+        setAdding(false); 
+      }
+    );
   };
   return (
     <div className="bg-[#F4F2F2] h-full w-6/7 absolute right-0">
@@ -59,12 +151,12 @@ const AddProduct = ({ toggleAddPage }) => {
         <div className="h-4/5 overflow-y-scroll">
           <div className="flex flex-col bg-white justify-between gap-15 h-fit px-20 py-10">
             <div className="flex justify-between">
-              <label htmlFor="name">Name</label>
+              <label htmlFor="productName">Name</label>
               <div className="w-4/5">
                 <Input
                   type="text"
                   className="w-full"
-                  {...register("name", { required: "Name is required" })}
+                  {...register("productName", { required: "Name is required" })}
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm">{errors.name.message}</p>
@@ -89,20 +181,56 @@ const AddProduct = ({ toggleAddPage }) => {
               </div>
             </div>
             <div className="flex justify-between">
-              <label htmlFor="category">Category</label>
-              <div className="w-4/5">
-                <Input
-                  className="w-full"
-                  type="text"
-                  {...register("category", {
-                    required: "category is required",
-                  })}
-                />
-                {errors.category && (
-                  <p className="text-red-500 text-sm">
-                    {errors.category.message}
-                  </p>
-                )}
+              <label htmlFor="description">Category</label>
+              <div className="flex flex-col items-center gap-2 w-4/5">
+                <div className="relative w-full">
+                  <select
+                    className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-full`}
+                    {...register("category", {
+                      required: "Category is required",
+                    })}
+                  >
+                    <option value="">Category</option>
+                    {category?.map((cat) => (
+                      <option key={cat?._id} value={cat?._id}>
+                        {cat?.categoryName}
+                      </option>
+                    ))}
+                  </select>
+                  <Icon.Triangle
+                    fill=""
+                    size={12}
+                    className="rotate-180 absolute right-3 top-4 pointer-events-none"
+                  />
+                  {errors.category && (
+                    <p className="text-red-500 text-sm">
+                      {errors.category.message}
+                    </p>
+                  )}
+                </div>
+                <span>OR</span>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    className="w-45"
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    value={newCategory}
+                    placeholder="Create New Category"
+                  />
+                  <Button
+                    type="button"
+                    disabled={newCategory === "" ? true : false}
+                    onClick={() => creatCategory(newCategory)}
+                    className={`${
+                      newCategory === ""
+                        ? "bg-gray-400 w-35"
+                        : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white w-35"
+                    }`}
+                  >
+                    {" "}
+                    Create
+                  </Button>
+                </div>
               </div>
             </div>
             <div className="flex justify-between">
@@ -114,7 +242,7 @@ const AddProduct = ({ toggleAddPage }) => {
                     className="flex flex-col items-center p-2"
                   >
                     <Icon.UploadCloud className="text-green-500" />
-                    <p>Click Here To Upload</p>
+                    <p>Click Here To Add</p>
                   </label>
                 </div>
                 <Input
@@ -198,9 +326,10 @@ const AddProduct = ({ toggleAddPage }) => {
           </Button>
           <Button
             type="submit"
-            className="bg-green-600 w-xl hover:bg-green-700 active:bg-green-800"
+            disabled={adding}
+            className={adding?"bg-gray-400 w-xl":"bg-green-600 w-xl hover:bg-green-700 active:bg-green-800"}
           >
-            Add Product
+            {adding ? "Adding..." : "Add Product"}
           </Button>
         </div>
       </form>
