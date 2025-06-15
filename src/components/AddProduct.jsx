@@ -5,7 +5,13 @@ import Input from "./Input";
 import Button from "./Button";
 import toast from "react-hot-toast";
 
-const AddProduct = ({ toggleAddPage, setRefresh }) => {
+const AddProduct = ({
+  toggleAddPage,
+  setRefresh,
+  productId,
+  refresh,
+  setProductId = null,
+}) => {
   const {
     register,
     handleSubmit,
@@ -20,6 +26,37 @@ const AddProduct = ({ toggleAddPage, setRefresh }) => {
 
   // Fetch categories from the API
   useEffect(() => {
+    if (productId) {
+      const fetchProduct = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/v1/product/getProduct/${productId}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+
+          const responseData = await response.json();
+          const product = responseData.data[0];
+
+          reset({
+            productName: product.productName,
+            description: product.description,
+            category: product.category._id,
+            price: product.price,
+            quantity: product.quantity,
+          });
+
+          setImagePreviews(product.image);
+        } catch (error) {
+          console.error("Error fetching product:", error);
+        }
+      };
+
+      // console.log(imagePreviews);
+      fetchProduct();
+    }
     const fetchCategories = async () => {
       try {
         const response = await fetch(
@@ -39,7 +76,7 @@ const AddProduct = ({ toggleAddPage, setRefresh }) => {
     };
 
     fetchCategories();
-  }, []);
+  }, [refresh, productId]);
 
   const creatCategory = async (category) => {
     try {
@@ -76,7 +113,7 @@ const AddProduct = ({ toggleAddPage, setRefresh }) => {
 
     // Store file previews
     const imageURL = files.map((file) => URL.createObjectURL(file));
-    const previews = [...imagePreviews, ...imageURL];
+    // const previews = [...imagePreviews, ...imageURL];
     setImagePreviews((prev) => [...prev, ...imageURL]);
 
     // Store actual files for submission
@@ -108,44 +145,92 @@ const AddProduct = ({ toggleAddPage, setRefresh }) => {
     formData.append("price", data.price);
     formData.append("quantity", data.quantity);
 
-    selectedFiles.forEach((file) => {
+    selectedFiles?.forEach((file) => {
       formData.append("images", file);
     });
 
     // console.log(data, imagePreviews);
     setAdding(true);
-    fetch("http://localhost:3000/api/v1/product/createProduct", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to add product");
-        }
-        toast.success("Product added successfully");
-        reset();
-        setImagePreviews([]);
-        toggleAddPage();
-        setRefresh((prev) => !prev); // Trigger refresh in parent component
-        setSelectedFiles([]);
-        return response.json();
+
+    if (!productId) {
+      fetch("http://localhost:3000/api/v1/product/createProduct", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
       })
-      .catch((error) => {
-        console.error("Error adding product:", error);
-        toast.error("Failed to add product");
+        .then((response) => {
+          console.log("Response:", response);
+
+          if (!response.ok) {
+            throw new Error("Failed to add product");
+          }
+          toast.success("Product added successfully");
+          reset();
+          setImagePreviews([]);
+          toggleAddPage();
+          setRefresh((prev) => !prev); // Trigger refresh in parent component
+          setSelectedFiles([]);
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Error adding product:", error);
+          // toast.error("Failed to add product");
+        })
+        .finally(() => {
+          setAdding(false);
+        });
+    } else {
+      formData.append("previousImages", imagePreviews);
+
+      fetch(`http://localhost:3000/api/v1/product/updateProduct/${productId}`, {
+        method: "PATCH",
+        body: formData,
+        credentials: "include",
       })
-      .finally(() => {
-        setAdding(false); 
-      }
-    );
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to update product");
+          }
+          toast.success("Product updated successfully");
+          reset();
+          setImagePreviews([]);
+          toggleAddPage();
+          setRefresh((prev) => !prev); // Trigger refresh in parent component
+          setSelectedFiles([]);
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Error updating product:", error);
+          toast.error("Failed to update product");
+        })
+        .finally(() => {
+          setAdding(false);
+        });
+    }
   };
   return (
-    <div className="bg-[#F4F2F2] h-full w-6/7 absolute right-0">
+    <div className="bg-[#F4F2F2] h-full w-6/7 absolute right-0 border border-red-500">
       {/* navigation */}
       <nav className="bg-gray-200 flex justify-between p-5 ">
-        <h2 className="font-bold text-lg">Add Product</h2>
-        <Icon.X onClick={toggleAddPage} />
+        <h2 className="font-bold text-lg">
+          {productId ? "Edit Product" : "Add Product"}
+        </h2>
+        <Icon.X
+          onClick={() => {
+            if (setProductId !== null) {
+              setProductId(null);
+            }
+            reset({
+              productName: "",
+              description: "",
+              category: "",
+              price: "",
+              quantity: "",
+            });
+            setImagePreviews([]);
+            toggleAddPage();
+          }}
+        />
       </nav>
       <form className="h-full" onSubmit={handleSubmit(onSubmit)}>
         <div className="h-4/5 overflow-y-scroll">
@@ -315,11 +400,24 @@ const AddProduct = ({ toggleAddPage, setRefresh }) => {
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-10 p-4 px-20">
+        <div className="flex gap-10 p-4 px-20  ">
           <Button
             type="button"
-            onClick={toggleAddPage}
-            className="bg-white w-xl hover:bg-gray-200 active:bg-gray-300"
+            onClick={() => {
+              if (setProductId !== null) {
+                setProductId(null);
+              }
+              reset({
+                productName: "",
+                description: "",
+                category: "",
+                price: "",
+                quantity: "",
+              });
+              setImagePreviews([]);
+              toggleAddPage();
+            }}
+            className="bg-white w-xl hover:bg-gray-200 active:bg-gray-300 "
             textColor={true}
           >
             Cancel
@@ -327,9 +425,19 @@ const AddProduct = ({ toggleAddPage, setRefresh }) => {
           <Button
             type="submit"
             disabled={adding}
-            className={adding?"bg-gray-400 w-xl":"bg-green-600 w-xl hover:bg-green-700 active:bg-green-800"}
+            className={
+              adding
+                ? "bg-gray-400 w-xl"
+                : "bg-green-600 w-xl hover:bg-green-700 active:bg-green-800 "
+            }
           >
-            {adding ? "Adding..." : "Add Product"}
+            {productId
+              ? adding
+                ? "Updating "
+                : "Update Product"
+              : adding
+              ? "Adding..."
+              : "Add Product"}
           </Button>
         </div>
       </form>

@@ -19,6 +19,7 @@ const Products = () => {
   const [pageInfo, setPageInfo] = useState({});
   const [pageNumber, setPageNumber] = useState(1);
   const [changePage, setChangePage] = useState(false);
+  const [productId, setProductId] = useState(null);
 
   // Fetch products from the API
   useEffect(() => {
@@ -32,8 +33,6 @@ const Products = () => {
     const callApi = setTimeout(() => {
       const fetchData = async () => {
         try {
-          console.log(pageNumber);
-
           const response = await fetch(
             `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}&page=${page}`,
             {
@@ -48,7 +47,6 @@ const Products = () => {
 
           setProducts(allProducts);
           setPageInfo(pageData);
-          console.log(responseData);
         } catch (error) {
           console.log("Error fetching products:", error);
         }
@@ -105,7 +103,8 @@ const Products = () => {
         .catch((error) => {
           console.error("Error deleting product:", error);
           toast.error("An error occurred while deleting the product");
-        }).finally(() => {
+        })
+        .finally(() => {
           setRefresh(!refresh);
         });
   };
@@ -146,7 +145,12 @@ const Products = () => {
           AddProductPage ? "absolute" : "hidden"
         } bg-[#12111150] w-full h-full z-10 top-0 left-0`}
       >
-        <AddProduct toggleAddPage={toggleAddPage} setRefresh={setRefresh} />
+        <AddProduct
+          toggleAddPage={toggleAddPage}
+          setRefresh={setRefresh}
+          productId={productId}
+          setProductId={setProductId}
+        />
       </div>
       <div className="p-5 flex flex-col gap-8">
         {/* quick action */}
@@ -309,7 +313,14 @@ const Products = () => {
                     </NavLink>
                   </li>
                   <li className="flex gap-3 cursor-pointer">
-                    <Icon.Edit size={20} className="hover:text-green-500" />
+                    <Icon.Edit
+                      onClick={() => {
+                        setProductId(product?._id);
+                        toggleAddPage();
+                      }}
+                      size={20}
+                      className="hover:text-green-500"
+                    />
                     <Icon.Trash2
                       size={20}
                       onClick={() => handleDeleteProduct(product?._id)}
@@ -357,8 +368,6 @@ const Products = () => {
                   <button
                     onClick={() => {
                       setPageNumber(pageInfo.page + 1);
-                      console.log("Next Page:", pageInfo.page + 1);
-
                       setChangePage(true);
                     }}
                     disabled={pageInfo.page === pageInfo.totalPages}

@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Button from "../components/Button";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import AddProduct from "../components/AddProduct";
 
 const ViewProduct = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState({});
   const [viewImage, setViewImage] = useState("");
   const [moreImages, setMoreImages] = useState([]);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [AddProductPage, setAddProductPage] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -33,10 +39,51 @@ const ViewProduct = () => {
     };
 
     fetchProduct();
-  }, [productId]);
+  }, [productId, refresh]);
+
+  const handleDeleteProduct = async () => {
+    confirm(`Are Sure You Want to Delete ${product?.productName}`) &&
+      setLoading(true) &
+        fetch(
+          `http://localhost:3000/api/v1/product/deleteProduct/${productId}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        )
+          .then(() => {
+            toast.success("Product deleted successfully");
+            navigate("/products");
+          })
+          .catch((error) => {
+            console.error("Error deleting product:", error);
+            toast.error("Failed to delete product");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+  };
+
+  const toggleAddPage = () => {
+    window.scrollTo(0, 0);
+    setAddProductPage(!AddProductPage);
+  };
 
   return (
     <div className="px-8 py-3 flex ">
+      {/* add product form */}
+      <div
+        className={`${
+          AddProductPage ? "absolute" : "hidden"
+        } bg-[#12111150] w-full h-full z-10 top-0 left-0 `}
+      >
+        <AddProduct
+          toggleAddPage={toggleAddPage}
+          productId={productId}
+          setRefresh={setRefresh}
+          refresh={refresh}
+        />
+      </div>
       {/*Product image */}
       <div className="w-1/2 flex flex-col gap-10 py-10">
         {/* image */}
@@ -95,11 +142,22 @@ const ViewProduct = () => {
 
         {/* buttons */}
         <div className="flex gap-5">
-          <Button className="bg-blue-400 w-1/2 hover:bg-blue-500 active:bg-blue-600">
+          <Button
+            onClick={() => toggleAddPage()}
+            className="bg-blue-400 w-1/2 hover:bg-blue-500 active:bg-blue-600"
+          >
             Edit
           </Button>
-          <Button className="bg-red-600 w-1/2 hover:bg-red-700 active:bg-red-800">
-            Delete
+          <Button
+            onClick={() => handleDeleteProduct()}
+            disabled={loading}
+            className={
+              loading
+                ? "bg-gray-300  w-1/2"
+                : "bg-red-600 w-1/2 hover:bg-red-700 active:bg-red-800"
+            }
+          >
+            {loading ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </div>
