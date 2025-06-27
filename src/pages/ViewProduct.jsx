@@ -74,8 +74,8 @@ const ViewProduct = () => {
       {/* add product form */}
       <div
         className={`${
-          AddProductPage ? "absolute" : "hidden"
-        } bg-[#12111150] w-full h-full z-10 top-0 left-0 `}
+          AddProductPage ? "fixed" : "hidden"
+        } bg-[#12111150] w-full h-full z-10 top-0 left-0`}
       >
         <AddProduct
           toggleAddPage={toggleAddPage}

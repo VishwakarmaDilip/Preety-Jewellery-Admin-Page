@@ -11,13 +11,6 @@ const router = createBrowserRouter([
     path: "/login",
     element: <Login/>,
   },
-
-  
-{
-  path: "/prada",
-  element: <div>Prada</div>,
-},
-
   // Private routes
   {
     path: "/",

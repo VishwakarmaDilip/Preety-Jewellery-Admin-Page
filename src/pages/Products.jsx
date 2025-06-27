@@ -20,6 +20,10 @@ const Products = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [changePage, setChangePage] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortType, setSortType] = useState("");
+  const [categoryId, setCategoryId] = useState("");
 
   // Fetch products from the API
   useEffect(() => {
@@ -29,12 +33,13 @@ const Products = () => {
     } else {
       page = 1; // Reset to page 1 if search term is not empty
     }
-    const delay = changePage ? 0 : 700; // Delay for debounce effect
+    let delay = (changePage || categoryId) ? 0 : 700; // Delay for debounce effect
     const callApi = setTimeout(() => {
+      setLoading(true);
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}&page=${page}`,
+            `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}&page=${page}&sortBy=${sortBy}&sortType=${sortType}&category=${categoryId}`,
             {
               method: "GET",
               credentials: "include",
@@ -42,13 +47,18 @@ const Products = () => {
           );
 
           const responseData = await response.json();
-          const allProducts = responseData.data.fetchedProduct;
+          const allProducts = responseData.data.fetchedProduct.map((product) => ({
+            ...product,
+            selected: false, // Initialize selected state for each product
+          }) );
           const pageData = responseData.data.pageInfo;
 
           setProducts(allProducts);
           setPageInfo(pageData);
         } catch (error) {
           console.log("Error fetching products:", error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -57,7 +67,7 @@ const Products = () => {
     }, delay);
 
     return () => clearTimeout(callApi);
-  }, [searchTerm, refresh, pageNumber]);
+  }, [searchTerm, refresh, pageNumber, sortBy, sortType, categoryId]);
 
   // Fetch categories from the API
   useEffect(() => {
@@ -83,7 +93,20 @@ const Products = () => {
   }, []);
 
   const onSubmit = (data) => {
-    console.log(data);
+    if (data.category !== "") {
+      setCategoryId(data.category);
+    } else {
+      setCategoryId("");
+    }
+
+    if (data.sortBy !== "") {
+      const sortData = data.sortBy.split(" ");
+      setSortBy(sortData[0]);
+      setSortType(sortData[1] || "");
+    } else {
+      setSortBy("createdAt");
+      setSortType("");
+    }
   };
 
   const handleDeleteProduct = async (id) => {
@@ -108,6 +131,40 @@ const Products = () => {
           setRefresh(!refresh);
         });
   };
+
+  const handleBulkDelete = () => {
+    const selectedProductIds = products.filter((product) => product.selected).map((product) => product._id)
+
+    let deleted = null
+
+    confirm("Are you sure you want to delete selected products?") && selectedProductIds.forEach((id) => {
+      fetch(`http://localhost:3000/api/v1/product/deleteProduct/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      })
+        .then((response) => {
+          if (response.ok) {
+            deleted = true;
+          } else {
+            toast.error("Failed to delete product");
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting product:", error);
+          toast.error("An error occurred while deleting the product");
+        })
+        .finally(() => {
+          setRefresh(!refresh);
+        });
+    })
+
+    if(deleted) {
+      toast.success("Selected products deleted successfully");
+    } else if(deleted === false) {
+      toast.error("some products could not be deleted");
+    }
+    
+  }
 
   const toggleAddPage = () => {
     window.scrollTo(0, 0);
@@ -156,7 +213,7 @@ const Products = () => {
         {/* quick action */}
         <div className="bg-white p-5 rounded-lg flex justify-end">
           <div className="flex gap-4">
-            <Button className="bg-rose-700 hover:bg-rose-800 active:bg-rose-900">
+            <Button onClick={() => handleBulkDelete()} className="bg-rose-700 hover:bg-rose-800 active:bg-rose-900">
               Delete In Bulk
             </Button>
             <Button
@@ -193,7 +250,7 @@ const Products = () => {
                     className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
                       sidebar ? "md:w-56" : "md:w-60"
                     } transition-all ease-in-out`}
-                    {...register("Category")}
+                    {...register("category")}
                   >
                     <option value="">Category</option>
                     {category?.map((cat) => (
@@ -212,12 +269,13 @@ const Products = () => {
                 <div className="relative">
                   <select
                     className="appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-60"
-                    {...register("Short")}
+                    {...register("sortBy")}
                   >
-                    <option value="">Short</option>
-                    <option value="Price Low to High">Price Low to High</option>
-                    <option value="Price High to Low">Price High to Low</option>
-                    <option value="createdAt">createdAt</option>
+                    <option value="createdAt">Short</option>
+                    <option value="price ascending">Price : Low to High</option>
+                    <option value="price descending">
+                      Price : High to Low
+                    </option>
                   </select>
                   <Icon.Triangle
                     fill=""
@@ -228,13 +286,22 @@ const Products = () => {
               </div>
 
               <div className="flex gap-6">
-                <Button type="submit" className="bg-violet-700 w-40">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className={
+                    loading ? "bg-gray-300 w-40" : "bg-violet-700 w-40"
+                  }
+                >
                   Filter
                 </Button>
                 <Button
                   onClick={() => {
                     setSearchTerm("");
-                    reset();
+                    reset({
+                      category: "",
+                      sortBy: "createdAt",
+                    });
                   }}
                   className="bg-red-600 w-40"
                 >
@@ -244,7 +311,7 @@ const Products = () => {
             </form>
           </div>
 
-          {/* orders */}
+          {/* Products */}
           <div className="bg-white rounded-lg overflow-hidden my-2 mt-5">
             {/* Heading */}
             <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-8">
@@ -286,7 +353,7 @@ const Products = () => {
                   <li className="flex gap-2 items-center cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={product?.selected}
+                      checked={!!product?.selected}
                       onChange={() => handleSelectItem(product?._id)}
                       className=" cursor-pointer"
                     />

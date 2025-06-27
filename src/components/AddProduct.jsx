@@ -159,7 +159,7 @@ const AddProduct = ({
         credentials: "include",
       })
         .then((response) => {
-          console.log("Response:", response);
+          // console.log("Response:", response);
 
           if (!response.ok) {
             throw new Error("Failed to add product");
@@ -209,7 +209,7 @@ const AddProduct = ({
     }
   };
   return (
-    <div className="bg-[#F4F2F2] h-full w-6/7 absolute right-0 border border-red-500">
+    <div className="bg-[#F4F2F2] h-full w-6/7 absolute right-0">
       {/* navigation */}
       <nav className="bg-gray-200 flex justify-between p-5 ">
         <h2 className="font-bold text-lg">
@@ -396,11 +396,23 @@ const AddProduct = ({
                 )}
               </div>
             </div>
+
+            <div className="flex justify-between">
+              <label htmlFor="quantity">Discount</label>
+              <div className="w-4/5">
+                <Input
+                  className="w-full"
+                  type="number"
+                  placeholder={"Enter Discount in %"}
+                  {...register("discount")}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-10 p-4 px-20  ">
+        <div className="flex gap-10 p-4 px-20">
           <Button
             type="button"
             onClick={() => {
