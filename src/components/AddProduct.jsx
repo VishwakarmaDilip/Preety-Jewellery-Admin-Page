@@ -356,7 +356,7 @@ const AddProduct = ({
                         <button
                           type="button"
                           onClick={() => handleRemoveImage(idx)}
-                          className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-md hover:bg-red-500 hover:text-white transition"
+                          className="absolute cursor-pointer top-1 right-1 bg-white rounded-full p-1 shadow-md hover:bg-red-500 hover:text-white transition"
                         >
                           <Icon.X size={9} />
                         </button>
