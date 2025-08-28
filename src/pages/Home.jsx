@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import AnalyticCard from "../components/AnalyticCard";
 
 const Home = () => {
-  const testArray = [1, 2, 3, 4, 5, 6, 7];
+  const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   // useEffect(() => {
   //   const fetchData = async() => {
