@@ -3,6 +3,7 @@ import * as Icon from "react-feather";
 import { sharedContext } from "./Layout";
 import Button from "./Button";
 import { NavLink, useNavigate } from "react-router-dom";
+import {Gem} from 'lucide-react'
 
 const Sidebar = () => {
   const { sidebar, setSidebar } = useContext(sharedContext);
@@ -61,8 +62,21 @@ const Sidebar = () => {
                     : "text-gray-500 flex items-center gap-2 mt-5"
                 }
               >
-                <Icon.Package size={18} />
+                <Gem size={18}/>
                 <span className="font-semibold">Products</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={"/Orders"}
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-theme flex items-center gap-2 mt-5"
+                    : "text-gray-500 flex items-center gap-2 mt-5"
+                }
+              >
+                <Icon.Package size={18} />
+                <span className="font-semibold">Orders</span>
               </NavLink>
             </li>
           </ul>

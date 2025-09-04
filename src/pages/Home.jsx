@@ -1,24 +1,25 @@
 import React, { useEffect } from "react";
 import AnalyticCard from "../components/AnalyticCard";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchOrders, fetchSummary } from "../features/ApiCalls";
 
 const Home = () => {
-  const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const dispatch = useDispatch();
+  const orders = useSelector((state) => state.order.orders);
+  const ORSummary = useSelector((state) => state.order.ORSummary);
+  const option = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  };
 
-  // useEffect(() => {
-  //   const fetchData = async() => {
-  //     try {
-  //       const response = await fetch(`http://localhost:3000/api/v1/owner/getOwner`,{
-  //         method: "GET",
-  //         credentials: "include",
-  //       })
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);  
-  //     }
-  //   }
+  useEffect(() => {
+    dispatch(fetchSummary());
+    dispatch(fetchOrders());
+  }, []);
 
-  
-  // }, [])
-  
   return (
     <div className="px-8 py-3">
       {/* Page title */}
@@ -32,25 +33,31 @@ const Home = () => {
             <div className="flex items-center justify-evenly p-5">
               <AnalyticCard
                 title={"Today"}
-                achieved={1566}
+                achieved={Number(ORSummary?.today?.revenue).toLocaleString()}
                 bgcolor={"bg-green-500"}
                 isAmount={true}
               />
               <AnalyticCard
                 title={"Yesterday"}
-                achieved={4566}
+                achieved={Number(
+                  ORSummary?.yesterday?.revenue
+                ).toLocaleString()}
                 bgcolor={"bg-orange-500"}
                 isAmount={true}
               />
               <AnalyticCard
                 title={"This Month"}
-                achieved={9545}
+                achieved={Number(
+                  ORSummary?.thisMonth?.revenue
+                ).toLocaleString()}
                 bgcolor={"bg-blue-500"}
                 isAmount={true}
               />
               <AnalyticCard
                 title={"Last Month"}
-                achieved={24560}
+                achieved={Number(
+                  ORSummary?.lastMonth?.revenue
+                ).toLocaleString()}
                 bgcolor={"bg-cyan-800"}
                 isAmount={true}
               />
@@ -63,22 +70,22 @@ const Home = () => {
             <div className="flex items-center justify-evenly p-5">
               <AnalyticCard
                 title={"Today"}
-                achieved={49}
+                achieved={Number(ORSummary?.today?.orders).toLocaleString()}
                 bgcolor={"bg-rose-600"}
               />
               <AnalyticCard
                 title={"Yesterday"}
-                achieved={60}
+                achieved={Number(ORSummary?.yesterday?.orders).toLocaleString()}
                 bgcolor={"bg-lime-700"}
               />
               <AnalyticCard
                 title={"This Month"}
-                achieved={155}
+                achieved={Number(ORSummary?.thisMonth?.orders).toLocaleString()}
                 bgcolor={"bg-indigo-700"}
               />
               <AnalyticCard
                 title={"Last Month"}
-                achieved={987}
+                achieved={Number(ORSummary?.lastMonth?.orders).toLocaleString()}
                 bgcolor={"bg-cyan-500"}
               />
             </div>
@@ -109,30 +116,50 @@ const Home = () => {
             </ul>
 
             {/* orders */}
-            {testArray.map((e) => {
-              return (
-                <ul
-                  className="grid grid-cols-7 px-6 py-3 pl-6 border-b border-gray-200"
-                  key={e}
-                >
-                  <li>
-                    <p>123456789</p>
-                  </li>
-                  <li>
-                    <p>₹450</p>
-                  </li>
-                  <li className="col-start-3 col-end-5">
-                    <p>27 Apr 2025, 03:30 PM</p>
-                  </li>
-                  <li className="col-start-5 col-end-7">
-                    <p>Ajay Sahu</p>
-                  </li>
-                  <li>
-                    <p className="text-red-600 font-bold">Pending</p>
-                  </li>
-                </ul>
-              );
-            })}
+            <div className="overflow-auto max-h-[30rem]">
+              {orders?.map((order, index) => {
+                return (
+                  <ul
+                    className="grid grid-cols-7 px-6 py-3 pl-6 border-b border-gray-200"
+                    key={index}
+                  >
+                    <li>
+                      <p>{order?.orderId}</p>
+                    </li>
+                    <li>
+                      <p className="font-semibold">
+                        ₹{Number(order?.grossAmount).toLocaleString()}
+                      </p>
+                      <p>{order?.paymentType}</p>
+                    </li>
+                    <li className="col-start-3 col-end-5">
+                      <p>
+                        {new Intl.DateTimeFormat("en-IN", option)
+                          .format(new Date(order?.createdAt))
+                          .replace(/am|pm/, (match) => match.toUpperCase())}
+                      </p>
+                    </li>
+                    <li className="col-start-5 col-end-7">
+                      <p>{order?.customer?.fullName}</p>
+                    </li>
+                    <li>
+                      <p
+                        className={`${
+                          order?.status === "Placed" ||
+                          order?.status === "cancelled"
+                            ? "text-red-500"
+                            : order?.status === "Shipping"
+                            ? "text-yellow-400"
+                            : "text-green-500"
+                        } font-bold`}
+                      >
+                        {order?.status === "Placed" ? "Pending" : order.status}
+                      </p>
+                    </li>
+                  </ul>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

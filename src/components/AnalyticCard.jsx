@@ -5,7 +5,7 @@ function AnalyticCard({ title, achieved, bgcolor, isAmount }) {
     <div
       className={`flex flex-col items-center text-white h-fit p-2.5 ${bgcolor} w-60 rounded-lg`}
     >
-      {isAmount ? <Icon.Layers size={34}/> : <Icon.Box size={34}/>}
+      {isAmount ? <Icon.Layers size={34}/> : <Icon.Package size={34}/>}
       <p className="text-xl">{title}</p>
       <p className="text-3xl font-bold">{`${isAmount?"₹":""}${achieved}`}</p>
     </div>
