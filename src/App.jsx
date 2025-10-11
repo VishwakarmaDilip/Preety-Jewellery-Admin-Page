@@ -5,6 +5,7 @@ import Products from "./pages/Products";
 import ViewProduct from "./pages/ViewProduct";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/login";
+import Orders from "./pages/Orders";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
           { path: "/", element: <Home /> },
           { path: "/products", element: <Products /> },
           { path: "/products/:productId", element: <ViewProduct /> },
+          { path: "/orders", element: <Orders /> },
         ],
       },
     ],

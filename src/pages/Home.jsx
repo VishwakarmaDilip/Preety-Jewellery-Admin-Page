@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import AnalyticCard from "../components/AnalyticCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders, fetchSummary } from "../features/ApiCalls";
+import * as Icon from "lucide-react"
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -97,7 +98,7 @@ const Home = () => {
           <h2 className="text-xl font-bold mt-2">Recent Order</h2>
           <div className="bg-white rounded-lg overflow-hidden mx-5 my-2 mt-5">
             {/* Heading */}
-            <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-7">
+            <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-8">
               <li>
                 <p>Order No.</p>
               </li>
@@ -113,6 +114,9 @@ const Home = () => {
               <li>
                 <p>Status</p>
               </li>
+              <li>
+                <p>Invoice</p>
+              </li>
             </ul>
 
             {/* orders */}
@@ -120,7 +124,7 @@ const Home = () => {
               {orders?.map((order, index) => {
                 return (
                   <ul
-                    className="grid grid-cols-7 px-6 py-3 pl-6 border-b border-gray-200"
+                    className="grid grid-cols-8 px-6 py-3 pl-6 border-b border-gray-200"
                     key={index}
                   >
                     <li>
@@ -155,6 +159,10 @@ const Home = () => {
                       >
                         {order?.status === "Placed" ? "Pending" : order.status}
                       </p>
+                    </li>
+                    <li className="flex gap-2">
+                      <Icon.Printer/>
+                      <Icon.Eye/>
                     </li>
                   </ul>
                 );
