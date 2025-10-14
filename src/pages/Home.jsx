@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import AnalyticCard from "../components/AnalyticCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders, fetchSummary } from "../features/ApiCalls";
-import * as Icon from "lucide-react"
+import * as Icon from "lucide-react";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -15,10 +15,16 @@ const Home = () => {
     hour: "numeric",
     minute: "numeric",
   };
+  const searchTerm = "",
+    page = 1,
+    startDate = "",
+    endDate = "";
+
+  const query = {searchTerm, page, startDate, endDate}
 
   useEffect(() => {
     dispatch(fetchSummary());
-    dispatch(fetchOrders());
+    dispatch(fetchOrders(query));
   }, []);
 
   return (
@@ -161,8 +167,8 @@ const Home = () => {
                       </p>
                     </li>
                     <li className="flex gap-2">
-                      <Icon.Printer/>
-                      <Icon.Eye/>
+                      <Icon.Printer />
+                      <Icon.Eye />
                     </li>
                   </ul>
                 );

@@ -1,19 +1,27 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { setOrders, setSummary, toggleOrderState } from "./order";
+import { setOrders, setPageInfo, setSummary, toggleOrderState } from "./order";
 
 // order related api calls
 export const fetchOrders = createAsyncThunk(
     "order/fetchOrders",
-    async (_, thunkAPI) => {
+    async (query, thunkAPI) => {
+        console.log(query);
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/order/getAllOrders`, {
+            
+            const { searchTerm, page, startDate, endDate } = query
+
+            const response = await fetch(`http://localhost:3000/api/v1/order/getAllOrders?query=${searchTerm}&page=${page}&startDate=${startDate}&endDate=${endDate}`, {
                 credentials: "include"
             })
 
             const responseData = await response.json()
-            const fetchOrders = responseData?.data?.fetchedOrders
-            thunkAPI.dispatch(setOrders(fetchOrders))
+            console.log(responseData);
             
+            const fetchOrders = responseData?.data?.fetchedOrders
+            const pageInfo = responseData?.data?.pageInfo
+            thunkAPI.dispatch(setOrders(fetchOrders))
+            thunkAPI.dispatch(setPageInfo(pageInfo))
+
         } catch (error) {
             console.error("Failed to fetch Order", error);
             return thunkAPI.rejectWithValue("Failed to fetch order");
@@ -25,7 +33,7 @@ export const fetchOrders = createAsyncThunk(
 
 export const fetchSummary = createAsyncThunk(
     "orders/fetchSummary",
-    async (_,thunkAPI) => {
+    async (_, thunkAPI) => {
         try {
             const response = await fetch(`http://localhost:3000/api/v1/order/getRevenueAndOrders`, {
                 credentials: "include"

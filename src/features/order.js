@@ -4,6 +4,7 @@ const initialState = {
     orderState : false,
     orders : [],
     ORSummary: [],
+    pageInfo: {},
 }
 
 export const orderSlice = createSlice({
@@ -19,10 +20,13 @@ export const orderSlice = createSlice({
         },
         setSummary : (state, action) => {
             state.ORSummary = action.payload
+        },
+        setPageInfo : (state, action) => {
+            state.pageInfo = action.payload
         }
     }
 })
 
-export const {toggleOrderState, setOrders, setSummary} = orderSlice.actions
+export const {toggleOrderState, setOrders, setSummary, setPageInfo} = orderSlice.actions
 
 export default orderSlice.reducer
