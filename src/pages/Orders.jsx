@@ -17,9 +17,12 @@ const Orders = () => {
   const [changePage, setChangePage] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [orderStatus, setOrderStatus] = useState("");
+  const [paymentType, setPaymentType] = useState("");
   const { sidebar } = useContext(sharedContext);
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [timeSpan, setTimeSpan] = useState("");
   const orders = useSelector((state) => state.order.orders);
   const pageInfo = useSelector((state) => state.order.pageInfo);
   const dispatch = useDispatch();
@@ -39,9 +42,16 @@ const Orders = () => {
       page = 1;
     }
 
-    let delay = changePage ? 0 : 700;
+    let delay = searchTerm == "" ? 0 : 700;
 
-    const query = { searchTerm, page, startDate, endDate };
+    const query = {
+      searchTerm,
+      page,
+      startDate,
+      endDate,
+      orderStatus,
+      paymentType,
+    };
 
     const getOrders = setTimeout(() => {
       setLoading(true);
@@ -51,13 +61,86 @@ const Orders = () => {
     }, delay);
 
     return () => clearTimeout(getOrders);
-  }, [searchTerm, refresh, pageNumber]);
+  }, [searchTerm, refresh, pageNumber, orderStatus, paymentType]);
 
-  console.log(orders);
+  const quickDate = (timeSpan) => {
+    switch (timeSpan) {
+      case "today":
+        const today = new Date();
 
-  const onSubmit = () => {};
+        today.setHours(0, 0, 0, 0);
+        setStartDate(today.getTime());
 
-  // const orders = [1, 2, 3, 4];
+        today.setHours(23, 59, 0, 0);
+        setEndDate(today.getTime());
+
+        setRefresh((prev) => !prev);
+
+        break;
+
+      case "yesterday":
+        const yesterday = new Date();
+        yesterday.setDate(new Date().getDate() - 1);
+
+        yesterday.setHours(0, 0, 0, 0);
+        setStartDate(yesterday.getTime());
+
+        yesterday.setHours(23, 59, 0, 0);
+        setEndDate(yesterday.getTime());
+
+        setRefresh((prev) => !prev);
+
+        break;
+
+      case "thisMonth":
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth();
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        setStartDate(firstDay.getTime());
+        setEndDate(lastDay.getTime());
+
+        setRefresh((prev) => !prev);
+
+        break;
+
+      case "lastMonth":
+        const Year = new Date().getFullYear();
+        const Month = new Date().getMonth();
+
+        const dayFirst = new Date(Year, Month - 1, 1);
+        const dayLast = new Date(Year, Month, 0);
+
+        setStartDate(dayFirst.getTime());
+        setEndDate(dayLast.getTime());
+
+        setRefresh((prev) => !prev);
+
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const onSubmit = (data) => {
+    const { startDate, endDate } = data;
+
+    const firstDay = new Date(startDate);
+    const lastDay = new Date(endDate);
+
+    firstDay.setHours(0, 0, 0, 0);
+    lastDay.setHours(23, 59, 0, 0);
+
+    setStartDate(firstDay.getTime());
+    setEndDate(lastDay.getTime());
+
+    setTimeSpan("custom")
+    setRefresh((prev) => !prev); 
+  };
+
   return (
     <div className="px-8 py-3">
       <h1 className="font-bold text-3xl mb-3">Orders</h1>
@@ -83,12 +166,17 @@ const Orders = () => {
             <div className="relative">
               <select
                 name="OrderStatus"
-                id=""
+                value={orderStatus}
+                onChange={(e) => setOrderStatus(e.target.value)}
                 className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
                   sidebar ? "md:w-56" : "md:w-60"
                 } transition-all ease-in-out`}
               >
-                <option value="Order Status">Order Status</option>
+                <option value="">Order Status</option>
+                <option value="Placed">Pending</option>
+                <option value="Shipping">Shipping</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
               </select>
               <Icon.Triangle
                 fill=""
@@ -97,19 +185,20 @@ const Orders = () => {
               />
             </div>
 
-            {/*  */}
+            {/* Payment Method */}
             <div className="relative">
-              {/* Payment Method */}
               <select
-                name="paymentMethod"
-                id=""
+                name="paymentType"
+                value={paymentType}
+                onChange={(e) => setPaymentType(e.target.value)}
                 className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
                   sidebar ? "md:w-56" : "md:w-60"
                 } transition-all ease-in-out`}
               >
                 <option value="">Payment Method</option>
-                <option value="">COD</option>
-                <option value="">Online</option>
+                <option value="COD">COD</option>
+                <option value="Online">Online</option>
+                <option value="UPI">UPI</option>
               </select>
               <Icon.Triangle
                 fill=""
@@ -117,16 +206,28 @@ const Orders = () => {
                 className="rotate-180 absolute right-3 top-4 pointer-events-none"
               />
             </div>
+
+            {/* Order Date filter readyMade*/}
             <div className="relative">
-              {/* order Status */}
               <select
-                name="OrderStatus"
-                id=""
+                name="quickDate"
+                value={timeSpan}
+                onChange={(e) => {
+                  quickDate(e.target.value);
+                  setTimeSpan(e.target.value)
+                }}
                 className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
                   sidebar ? "md:w-56" : "md:w-60"
                 } transition-all ease-in-out`}
               >
-                <option value="Order Status">All Orders</option>
+                <option value="">All Orders</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="thisMonth">This Month</option>
+                <option value="lastMonth">Last Month</option>
+                <option className="hidden" value="custom">
+                  Custom
+                </option>
               </select>
               <Icon.Triangle
                 fill=""
@@ -161,8 +262,13 @@ const Orders = () => {
             <Button
               onClick={() => {
                 setSearchTerm("");
+                setTimeSpan("")
+                setStartDate("") 
+                setEndDate("")
                 reset();
+                setRefresh(prev => !prev) 
               }}
+              type={"button"}
               className="bg-red-600 w-40"
             >
               Reset
@@ -303,7 +409,6 @@ const Orders = () => {
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>

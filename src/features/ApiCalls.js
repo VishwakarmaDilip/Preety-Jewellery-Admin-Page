@@ -5,17 +5,15 @@ import { setOrders, setPageInfo, setSummary, toggleOrderState } from "./order";
 export const fetchOrders = createAsyncThunk(
     "order/fetchOrders",
     async (query, thunkAPI) => {
-        console.log(query);
         try {
             
-            const { searchTerm, page, startDate, endDate } = query
+            const { searchTerm, page, startDate, endDate, orderStatus, paymentType } = query
 
-            const response = await fetch(`http://localhost:3000/api/v1/order/getAllOrders?query=${searchTerm}&page=${page}&startDate=${startDate}&endDate=${endDate}`, {
+            const response = await fetch(`http://localhost:3000/api/v1/order/getAllOrders?query=${searchTerm}&page=${page}&startDate=${startDate}&endDate=${endDate}&orderStatus=${orderStatus}&paymentType=${paymentType}`, {
                 credentials: "include"
             })
 
             const responseData = await response.json()
-            console.log(responseData);
             
             const fetchOrders = responseData?.data?.fetchedOrders
             const pageInfo = responseData?.data?.pageInfo
