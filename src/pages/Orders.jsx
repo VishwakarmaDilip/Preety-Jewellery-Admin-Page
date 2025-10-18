@@ -9,6 +9,7 @@ import Button from "../components/Button";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "../features/ApiCalls";
+import toast from "react-hot-toast";
 
 const Orders = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -41,6 +42,7 @@ const Orders = () => {
     } else {
       page = 1;
     }
+    console.log(orders);
 
     let delay = searchTerm == "" ? 0 : 700;
 
@@ -134,11 +136,19 @@ const Orders = () => {
     firstDay.setHours(0, 0, 0, 0);
     lastDay.setHours(23, 59, 0, 0);
 
-    setStartDate(firstDay.getTime());
-    setEndDate(lastDay.getTime());
+    const firstDayTime = firstDay.getTime();
+    const lastDayTime = lastDay.getTime();
 
-    setTimeSpan("custom")
-    setRefresh((prev) => !prev); 
+    if (firstDayTime < lastDayTime) {
+      setStartDate(firstDayTime);
+      setEndDate(lastDayTime);
+    } else {
+      toast.error("Start date must be before end date");
+      return
+    }
+
+    setTimeSpan("custom");
+    setRefresh((prev) => !prev);
   };
 
   return (
@@ -214,7 +224,7 @@ const Orders = () => {
                 value={timeSpan}
                 onChange={(e) => {
                   quickDate(e.target.value);
-                  setTimeSpan(e.target.value)
+                  setTimeSpan(e.target.value);
                 }}
                 className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
                   sidebar ? "md:w-56" : "md:w-60"
@@ -262,11 +272,12 @@ const Orders = () => {
             <Button
               onClick={() => {
                 setSearchTerm("");
-                setTimeSpan("")
-                setStartDate("") 
-                setEndDate("")
+                setTimeSpan("");
+                setStartDate("");
+                setEndDate("");
+                setOrderStatus("");
                 reset();
-                setRefresh(prev => !prev) 
+                setRefresh((prev) => !prev);
               }}
               type={"button"}
               className="bg-red-600 w-40"
@@ -309,7 +320,7 @@ const Orders = () => {
           {/* order row */}
           {orders?.length > 0 ? (
             orders?.map((order) => (
-              <NavLink to={"/"} key={order?._id}>
+              <NavLink to={`/orders/${order._id}`} key={order?._id}>
                 <ul className="border-b border-gray-200 px-6 py-3 place-items-center grid grid-cols-10">
                   <li className="flex gap-2 items-center">
                     <p>{order?.orderId}</p>
@@ -334,7 +345,7 @@ const Orders = () => {
                     <p
                       className={`${
                         order?.status === "Placed" ||
-                        order?.status === "cancelled"
+                        order?.status === "Cancelled"
                           ? "text-red-500"
                           : order?.status === "Shipping"
                           ? "text-yellow-400"

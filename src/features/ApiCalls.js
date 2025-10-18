@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { setOrders, setPageInfo, setSummary, toggleOrderState } from "./order";
+import { setOneOrder, setOrders, setPageInfo, setSummary, toggleOrderState } from "./order";
+import toast from "react-hot-toast";
 
 // order related api calls
 export const fetchOrders = createAsyncThunk(
@@ -46,3 +47,44 @@ export const fetchSummary = createAsyncThunk(
         }
     }
 )
+
+export const getOrder = createAsyncThunk(
+    "orders/getOrder",
+    async(order_id, thunkAPI) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/v1/order/getOrder/${order_id}`, {
+                credentials: "include"
+            })
+
+            const responseData = await response.json()
+            const fetchedOrder = responseData?.data[0] || {}
+
+            thunkAPI.dispatch(setOneOrder(fetchedOrder))
+            
+        } catch (error) {
+            console.error("Failed to fetch", error);
+            return thunkAPI.rejectWithValue("Failed to fetch");
+        }
+    }
+)
+
+export const cancelTheOrder = createAsyncThunk(
+     "orders/cancelOrder",
+    async(order_id, thunkAPI) => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/v1/order/cancelOrder/${order_id}`, {
+                method: "POST",
+                credentials: "include"
+            })
+            if (response.status < 399) {
+                toast.success("Order cancelled successfully")
+            } else {
+                toast.error("Failed to cancel the order")
+            }
+        } catch (error) {
+            console.error("Failed to cancel", error);
+            return thunkAPI.rejectWithValue("Failed to cancel"); 
+        }
+    }
+)
+   

@@ -6,6 +6,7 @@ import ViewProduct from "./pages/ViewProduct";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/login";
 import Orders from "./pages/Orders";
+import ViewOrder from "./pages/viewOrder";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
           { path: "/products", element: <Products /> },
           { path: "/products/:productId", element: <ViewProduct /> },
           { path: "/orders", element: <Orders /> },
+          { path: "/orders/:orderId", element: <ViewOrder/> },
         ],
       },
     ],
