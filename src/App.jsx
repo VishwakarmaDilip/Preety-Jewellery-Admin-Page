@@ -7,6 +7,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/login";
 import Orders from "./pages/Orders";
 import ViewOrder from "./pages/viewOrder";
+import Invoice from "./pages/Invoice";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
           { path: "/orders/:orderId", element: <ViewOrder/> },
         ],
       },
+      {path:"/invoice", element:<Invoice/>},
     ],
   },
 ]);

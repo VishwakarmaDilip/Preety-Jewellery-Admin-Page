@@ -21,26 +21,25 @@ const ViewOrder = () => {
     dispatch(getOrder(order_id.orderId));
   }, [refresh]);
 
-
   const orderDate = fetchedOrder?.createdAt
     ? new Intl.DateTimeFormat("en-IN", option).format(
         new Date(fetchedOrder?.createdAt)
       )
     : "";
 
-    const acceptOrder = () => {
+  const acceptOrder = () => {};
 
+  const cancelOrder = () => {
+    const isCancellationAllowed = confirm(
+      "Are you sure you want to cancel this order?"
+    );
+
+    if (isCancellationAllowed) {
+      dispatch(cancelTheOrder(order_id.orderId));
+    } else {
+      toast.error("Order cancellation aborted");
     }
-
-    const cancelOrder = () => {
-        const isCancellationAllowed = confirm("Are you sure you want to cancel this order?")
-
-        if(isCancellationAllowed) {
-            dispatch(cancelTheOrder(order_id.orderId))
-        } else {
-            toast.error("Order cancellation aborted")
-        }
-    }
+  };
 
   return (
     <div className="mt-16 p-5 px-32">
@@ -169,9 +168,23 @@ const ViewOrder = () => {
           </div>
         </div>
       </div>
-      <div className=" h-10 mt-2 flex gap-4" >
-          <Button className={"bg-red-700 w-1/2 hover:bg-red-800 active:bg-red-900"} onClick={() => cancelOrder(order_id)}>Cancel</Button>
-          <Button className={"bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"}>Accept</Button>
+      <div className=" h-10 mt-2 flex gap-4">
+        <Button
+          className={"bg-red-700 w-1/2 hover:bg-red-800 active:bg-red-900"}
+          onClick={() => {
+            cancelOrder(order_id);
+            setRefresh((prev) => !prev);
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          className={
+            "bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"
+          }
+        >
+          Accept
+        </Button>
       </div>
     </div>
   );

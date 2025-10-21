@@ -7,7 +7,6 @@ export const fetchOrders = createAsyncThunk(
     "order/fetchOrders",
     async (query, thunkAPI) => {
         try {
-            
             const { searchTerm, page, startDate, endDate, orderStatus, paymentType } = query
 
             const response = await fetch(`http://localhost:3000/api/v1/order/getAllOrders?query=${searchTerm}&page=${page}&startDate=${startDate}&endDate=${endDate}&orderStatus=${orderStatus}&paymentType=${paymentType}`, {

@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { sharedContext } from "../components/Layout";
 import { useForm } from "react-hook-form";
 import Button from "../components/Button";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "../features/ApiCalls";
 import toast from "react-hot-toast";
@@ -27,6 +27,7 @@ const Orders = () => {
   const orders = useSelector((state) => state.order.orders);
   const pageInfo = useSelector((state) => state.order.pageInfo);
   const dispatch = useDispatch();
+  const navigate = useNavigate()
   const option = {
     year: "numeric",
     month: "long",
@@ -42,7 +43,6 @@ const Orders = () => {
     } else {
       page = 1;
     }
-    console.log(orders);
 
     let delay = searchTerm == "" ? 0 : 700;
 
@@ -225,6 +225,7 @@ const Orders = () => {
                 onChange={(e) => {
                   quickDate(e.target.value);
                   setTimeSpan(e.target.value);
+                  reset()
                 }}
                 className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
                   sidebar ? "md:w-56" : "md:w-60"
@@ -359,10 +360,16 @@ const Orders = () => {
                     <p>{order?.products.length}</p>
                   </li>
                   <li className="flex gap-3">
-                    <div>
+                    <div onClick={(e) => {
+                      e.preventDefault()
+                      navigate("/")
+                    }}>
                       <Icon.Printer />
                     </div>
-                    <div>
+                    <div onClick={(e) => {
+                      e.preventDefault()
+                      navigate("/invoice")
+                    }}>
                       <Icon.Eye />
                     </div>
                   </li>

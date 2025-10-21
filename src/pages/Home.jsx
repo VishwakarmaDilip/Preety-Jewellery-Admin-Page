@@ -18,9 +18,11 @@ const Home = () => {
   const searchTerm = "",
     page = 1,
     startDate = "",
-    endDate = "";
+    endDate = "",
+    orderStatus = "",
+    paymentType = "";
 
-  const query = {searchTerm, page, startDate, endDate}
+  const query = {searchTerm, page, startDate, endDate, orderStatus, paymentType};
 
   useEffect(() => {
     dispatch(fetchSummary());
@@ -156,7 +158,7 @@ const Home = () => {
                       <p
                         className={`${
                           order?.status === "Placed" ||
-                          order?.status === "cancelled"
+                          order?.status === "Cancelled"
                             ? "text-red-500"
                             : order?.status === "Shipping"
                             ? "text-yellow-400"
