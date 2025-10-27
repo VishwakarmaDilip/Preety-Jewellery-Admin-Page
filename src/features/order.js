@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getOrder } from "./ApiCalls";
 
 const initialState = {
     orderState : false,
@@ -6,6 +7,7 @@ const initialState = {
     ORSummary: [],
     pageInfo: {},
     oneOrder: {},
+    reload: false
 }
 
 export const orderSlice = createSlice({
@@ -26,8 +28,17 @@ export const orderSlice = createSlice({
             state.pageInfo = action.payload
         },
         setOneOrder : (state, action) => {
-            state.oneOrder = action.payload
-        }
+            state.oneOrder = {...action.payload}
+        },
+    },
+
+    extraReducers: (builder) => {
+        builder
+            .addCase(getOrder.fulfilled,(state, action)=> {
+                state.oneOrder = {...action.payload}
+                state.reload = !state.reload
+
+            })
     }
 })
 

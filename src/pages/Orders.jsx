@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import * as Icon from "lucide-react";
 import { useState } from "react";
 import Input from "../components/Input";
@@ -10,8 +10,10 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "../features/ApiCalls";
 import toast from "react-hot-toast";
+import Invoice from "./Invoice";
 
 const Orders = () => {
+  const invoiceRef = useRef();
   const { register, handleSubmit, reset } = useForm();
   const [searchTerm, setSearchTerm] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
@@ -26,8 +28,9 @@ const Orders = () => {
   const [timeSpan, setTimeSpan] = useState("");
   const orders = useSelector((state) => state.order.orders);
   const pageInfo = useSelector((state) => state.order.pageInfo);
+  const [orderId, setOrderId] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const option = {
     year: "numeric",
     month: "long",
@@ -144,15 +147,71 @@ const Orders = () => {
       setEndDate(lastDayTime);
     } else {
       toast.error("Start date must be before end date");
-      return
+      return;
     }
 
     setTimeSpan("custom");
     setRefresh((prev) => !prev);
   };
 
+  const printInvoice = () => {
+    const printContent = invoiceRef.current.innerHTML;
+    const printWindow = window.open("", "_blank");
+
+    // Get your compiled CSS file path (usually /index.css or /src/output.css)
+    const appStyles = Array.from(document.styleSheets)
+      .map((sheet) => {
+        try {
+          return sheet.href
+            ? `<link rel="stylesheet" href="${sheet.href}">`
+            : "";
+        } catch (err) {
+          return "";
+        }
+      })
+      .join("");
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>Invoice</title>
+        ${appStyles}
+        <style>
+          @page { size: A4; margin: 15mm; }
+          body {
+            background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .no-print { display: none !important; }
+        </style>
+      </head>
+      <body class="bg-white">
+        <div class="print:p-0 print:bg-white">
+          ${printContent}
+        </div>
+      </body>
+    </html>
+  `);
+
+    printWindow.document.close();
+
+    // Wait for CSS to fully load
+    printWindow.onload = () => {
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 50);
+    };
+  };
+
   return (
     <div className="px-8 py-3">
+      {orderId && (
+        <div ref={invoiceRef} className={`absolute right-full`}>
+          <Invoice orderId={orderId} />
+        </div>
+      )}
       <h1 className="font-bold text-3xl mb-3">Orders</h1>
       {/* Main body */}
       <div className="flex flex-col gap-4">
@@ -225,7 +284,7 @@ const Orders = () => {
                 onChange={(e) => {
                   quickDate(e.target.value);
                   setTimeSpan(e.target.value);
-                  reset()
+                  reset();
                 }}
                 className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
                   sidebar ? "md:w-56" : "md:w-60"
@@ -360,16 +419,24 @@ const Orders = () => {
                     <p>{order?.products.length}</p>
                   </li>
                   <li className="flex gap-3">
-                    <div onClick={(e) => {
-                      e.preventDefault()
-                      navigate("/")
-                    }}>
+                    <div
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setOrderId(order._id);
+                        setTimeout(() => {
+                          printInvoice();
+                          setOrderId("");
+                        }, 50);
+                      }}
+                    >
                       <Icon.Printer />
                     </div>
-                    <div onClick={(e) => {
-                      e.preventDefault()
-                      navigate("/invoice")
-                    }}>
+                    <div
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/invoice/${order._id}`);
+                      }}
+                    >
                       <Icon.Eye />
                     </div>
                   </li>

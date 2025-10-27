@@ -1,7 +1,7 @@
 import * as Icon from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { cancelTheOrder, getOrder } from "../features/ApiCalls";
 import Button from "../components/Button";
 import toast from "react-hot-toast";
@@ -11,6 +11,7 @@ const ViewOrder = () => {
   const dispatch = useDispatch();
   const [refresh, setRefresh] = useState(false);
   const fetchedOrder = useSelector((state) => state.order.oneOrder);
+  const isReload = useSelector((state) => state.order.reload)
   const option = {
     year: "numeric",
     month: "long",
@@ -18,8 +19,8 @@ const ViewOrder = () => {
   };
 
   useEffect(() => {
-    dispatch(getOrder(order_id.orderId));
-  }, [refresh]);
+    dispatch(getOrder(order_id.orderId)); 
+  }, [isReload]);
 
   const orderDate = fetchedOrder?.createdAt
     ? new Intl.DateTimeFormat("en-IN", option).format(
@@ -36,6 +37,7 @@ const ViewOrder = () => {
 
     if (isCancellationAllowed) {
       dispatch(cancelTheOrder(order_id.orderId));
+      setRefresh((prev) => !prev);
     } else {
       toast.error("Order cancellation aborted");
     }
@@ -55,10 +57,10 @@ const ViewOrder = () => {
             {/* invoice and trackOrder */}
             <div className="flex gap-6">
               {/* Invoice */}
-              <div className="flex items-center justify-center gap-2 shadow-boxShadowBorder2 rounded-lg w-28 h-10">
+              <NavLink to={"/invoice"} target="_blank" className="flex items-center justify-center gap-2 shadow-boxShadowBorder2 rounded-lg w-28 h-10">
                 <Icon.FileText />
                 <p>Invoice</p>
-              </div>
+              </NavLink>
 
               {/* Track Order */}
               <div className="flex items-center justify-center w-36 h-10 bg-blue-500 text-white rounded-lg gap-2">
@@ -170,18 +172,17 @@ const ViewOrder = () => {
       </div>
       <div className=" h-10 mt-2 flex gap-4">
         <Button
-          className={"bg-red-700 w-1/2 hover:bg-red-800 active:bg-red-900"}
+          className={fetchedOrder?.status === "Cancelled"? `bg-gray-400 w-1/2` : `bg-red-700 w-1/2 hover:bg-red-800 active:bg-red-900`}
+          disabled={fetchedOrder?.status != "Cancelled" ? false : true}
           onClick={() => {
             cancelOrder(order_id);
-            setRefresh((prev) => !prev);
           }}
         >
           Cancel
         </Button>
         <Button
-          className={
-            "bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"
-          }
+          className={fetchedOrder?.status === "Cancelled"? `bg-gray-400 w-1/2` : "bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"}
+          disabled={fetchedOrder?.status != "Cancelled" ? false : true}
         >
           Accept
         </Button>

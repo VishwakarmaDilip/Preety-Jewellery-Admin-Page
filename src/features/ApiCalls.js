@@ -58,7 +58,9 @@ export const getOrder = createAsyncThunk(
             const responseData = await response.json()
             const fetchedOrder = responseData?.data[0] || {}
 
-            thunkAPI.dispatch(setOneOrder(fetchedOrder))
+            // thunkAPI.dispatch(setOneOrder(fetchedOrder))
+
+            return fetchedOrder
             
         } catch (error) {
             console.error("Failed to fetch", error);

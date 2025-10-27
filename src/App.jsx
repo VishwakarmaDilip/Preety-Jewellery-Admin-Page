@@ -30,7 +30,7 @@ const router = createBrowserRouter([
           { path: "/orders/:orderId", element: <ViewOrder/> },
         ],
       },
-      {path:"/invoice", element:<Invoice/>},
+      {path:"/invoice/:orderId", element:<Invoice/>},
     ],
   },
 ]);
