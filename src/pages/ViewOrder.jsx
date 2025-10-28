@@ -57,7 +57,7 @@ const ViewOrder = () => {
             {/* invoice and trackOrder */}
             <div className="flex gap-6">
               {/* Invoice */}
-              <NavLink to={"/invoice"} target="_blank" className="flex items-center justify-center gap-2 shadow-boxShadowBorder2 rounded-lg w-28 h-10">
+              <NavLink to={`/invoice/${order_id.orderId}`} target="_blank" className="flex items-center justify-center gap-2 shadow-boxShadowBorder2 rounded-lg w-28 h-10">
                 <Icon.FileText />
                 <p>Invoice</p>
               </NavLink>

@@ -1,13 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AnalyticCard from "../components/AnalyticCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders, fetchSummary } from "../features/ApiCalls";
 import * as Icon from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import Invoice from "./Invoice";
 
 const Home = () => {
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.order.orders);
   const ORSummary = useSelector((state) => state.order.ORSummary);
+  const [orderId, setOrderId] = useState("");
+  const invoiceRef = useRef();
+  const navigate = useNavigate();
   const option = {
     year: "numeric",
     month: "long",
@@ -22,15 +27,78 @@ const Home = () => {
     orderStatus = "",
     paymentType = "";
 
-  const query = {searchTerm, page, startDate, endDate, orderStatus, paymentType};
+  const query = {
+    searchTerm,
+    page,
+    startDate,
+    endDate,
+    orderStatus,
+    paymentType,
+  };
 
   useEffect(() => {
     dispatch(fetchSummary());
     dispatch(fetchOrders(query));
   }, []);
 
+  const printInvoice = () => {
+    const printContent = invoiceRef.current.innerHTML;
+    const printWindow = window.open("", "_blank");
+
+    // Get your compiled CSS file path (usually /index.css or /src/output.css)
+    const appStyles = Array.from(document.styleSheets)
+      .map((sheet) => {
+        try {
+          return sheet.href
+            ? `<link rel="stylesheet" href="${sheet.href}">`
+            : "";
+        } catch (err) {
+          return "";
+        }
+      })
+      .join("");
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>Invoice</title>
+        ${appStyles}
+        <style>
+          // @page { size: A4; margin: 5mm; }
+          body {
+            background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .no-print { display: none !important; }
+        </style>
+      </head>
+      <body class="bg-white">
+        <div class="print:p-0 print:bg-white">
+          ${printContent}
+        </div>
+      </body>
+    </html>
+  `);
+
+    printWindow.document.close();
+
+    // Wait for CSS to fully load
+    printWindow.onload = () => {
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 50);
+    };
+  };
+
   return (
     <div className="px-8 py-3">
+      {orderId && (
+        <div ref={invoiceRef} className={`absolute right-full`}>
+          <Invoice orderId={orderId} />
+        </div>
+      )}
       {/* Page title */}
       <h1 className="font-bold text-2xl">Dashboard</h1>
       <div className="p-5 flex flex-col gap-12">
@@ -128,51 +196,70 @@ const Home = () => {
             </ul>
 
             {/* orders */}
-            <div className="overflow-auto max-h-[30rem]">
-              {orders?.map((order, index) => {
+            <div className="overflow-auto max-h-[50rem]">
+              {orders?.map((order) => {
                 return (
-                  <ul
-                    className="grid grid-cols-8 px-6 py-3 pl-6 border-b border-gray-200"
-                    key={index}
-                  >
-                    <li>
-                      <p>{order?.orderId}</p>
-                    </li>
-                    <li>
-                      <p className="font-semibold">
-                        ₹{Number(order?.grossAmount).toLocaleString()}
-                      </p>
-                      <p>{order?.paymentType}</p>
-                    </li>
-                    <li className="col-start-3 col-end-5">
-                      <p>
-                        {new Intl.DateTimeFormat("en-IN", option)
-                          .format(new Date(order?.createdAt))
-                          .replace(/am|pm/, (match) => match.toUpperCase())}
-                      </p>
-                    </li>
-                    <li className="col-start-5 col-end-7">
-                      <p>{order?.customer?.fullName}</p>
-                    </li>
-                    <li>
-                      <p
-                        className={`${
-                          order?.status === "Placed" ||
-                          order?.status === "Cancelled"
-                            ? "text-red-500"
-                            : order?.status === "Shipping"
-                            ? "text-yellow-400"
-                            : "text-green-500"
-                        } font-bold`}
-                      >
-                        {order?.status === "Placed" ? "Pending" : order.status}
-                      </p>
-                    </li>
-                    <li className="flex gap-2">
-                      <Icon.Printer />
-                      <Icon.Eye />
-                    </li>
-                  </ul>
+                  <NavLink to={`/orders/${order._id}`} key={order?._id}>
+                    <ul className="grid grid-cols-8 pr-3 py-3 pl-6 border-b border-gray-200">
+                      <li>
+                        <p>{order?.orderId}</p>
+                      </li>
+                      <li>
+                        <p className="font-semibold">
+                          ₹{Number(order?.netAmount).toLocaleString()}
+                        </p>
+                        <p>{order?.paymentType}</p>
+                      </li>
+                      <li className="col-start-3 col-end-5">
+                        <p>
+                          {new Intl.DateTimeFormat("en-IN", option)
+                            .format(new Date(order?.createdAt))
+                            .replace(/am|pm/, (match) => match.toUpperCase())}
+                        </p>
+                      </li>
+                      <li className="col-start-5 col-end-7">
+                        <p>{order?.customer?.fullName}</p>
+                      </li>
+                      <li>
+                        <p
+                          className={`${
+                            order?.status === "Placed" ||
+                            order?.status === "Cancelled"
+                              ? "text-red-500"
+                              : order?.status === "Shipping"
+                              ? "text-yellow-400"
+                              : "text-green-500"
+                          } font-bold`}
+                        >
+                          {order?.status === "Placed"
+                            ? "Pending"
+                            : order.status}
+                        </p>
+                      </li>
+                      <li className="flex gap-3">
+                        <div
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setOrderId(order._id);
+                            setTimeout(() => {
+                              printInvoice();
+                              setOrderId("");
+                            }, 50);
+                          }}
+                        >
+                          <Icon.Printer />
+                        </div>
+                        <div
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/invoice/${order._id}`);
+                          }}
+                        >
+                          <Icon.Eye />
+                        </div>
+                      </li>
+                    </ul>
+                  </NavLink>
                 );
               })}
             </div>

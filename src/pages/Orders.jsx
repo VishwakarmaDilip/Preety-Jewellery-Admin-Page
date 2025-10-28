@@ -177,7 +177,7 @@ const Orders = () => {
         <title>Invoice</title>
         ${appStyles}
         <style>
-          @page { size: A4; margin: 15mm; }
+          // @page { size: A4; margin: 5mm; }
           body {
             background: white !important;
             -webkit-print-color-adjust: exact !important;
