@@ -13,24 +13,27 @@ import toast from "react-hot-toast";
 import Invoice from "./Invoice";
 
 const Orders = () => {
-  const invoiceRef = useRef();
-  const { register, handleSubmit, reset } = useForm();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [pageNumber, setPageNumber] = useState(1);
+  const orders = useSelector((state) => state.order.orders);
+  const pageInfo = useSelector((state) => state.order.pageInfo);
+
   const [changePage, setChangePage] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [orderStatus, setOrderStatus] = useState("");
   const [paymentType, setPaymentType] = useState("");
-  const { sidebar } = useContext(sharedContext);
-  const [loading, setLoading] = useState(false);
-  const [refresh, setRefresh] = useState(false);
   const [timeSpan, setTimeSpan] = useState("");
-  const orders = useSelector((state) => state.order.orders);
-  const pageInfo = useSelector((state) => state.order.pageInfo);
   const [orderId, setOrderId] = useState("");
+  const [maxDate, setMaxDate] = useState("");
+
+  const { sidebar } = useContext(sharedContext);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const invoiceRef = useRef();
+  const { register, handleSubmit, reset, watch } = useForm();
   const option = {
     year: "numeric",
     month: "long",
@@ -46,6 +49,14 @@ const Orders = () => {
     } else {
       page = 1;
     }
+
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const localDate = `${yyyy}-${mm}-${dd}`;
+
+    setMaxDate(localDate);
 
     let delay = searchTerm == "" ? 0 : 700;
 
@@ -205,6 +216,8 @@ const Orders = () => {
     };
   };
 
+  // console.log(maxDate);
+
   return (
     <div className="px-8 py-3">
       {orderId && (
@@ -314,11 +327,16 @@ const Orders = () => {
         >
           <div>
             <label htmlFor="">Start Date: </label>
-            <Input type={"date"} {...register("startDate")} />
+            <Input type={"date"} max={maxDate} {...register("startDate")} />
           </div>
           <div>
             <label htmlFor="">End Date: </label>
-            <Input type={"date"} {...register("endDate")} />
+            <Input
+              type={"date"}
+              min={watch("startDate")}
+              max={maxDate}
+              {...register("endDate")}
+            />
           </div>
 
           <div className="space-x-16">
