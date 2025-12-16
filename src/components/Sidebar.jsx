@@ -13,7 +13,7 @@ const Sidebar = () => {
   };
   const handleLogout = () => {
     try {
-      fetch(`http://localhost:3000/api/v1/owner/logout`, {
+      fetch(`https://api.devbydilip.cloud/api/v1/owner/logout`, {
         method: "POST",
         credentials: "include",
       });
