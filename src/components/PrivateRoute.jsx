@@ -1,11 +1,13 @@
 // components/PrivateRoute.jsx
 import React from "react";
+import {useSelector } from "react-redux";
 import { Navigate, Outlet} from "react-router-dom";
-import Cookies from "js-cookie";
 
 const PrivateRoute = () => {
-  const token = Cookies.get("refreshToken") || Cookies.get("accessToken");
-  
+  const token = useSelector((state) => state.owner.isLoggedIn)
+  const loading = useSelector((state) => state.owner.loading)
+
+  if (loading) return <div>Loading...</div>;
   return token ? <Outlet/> : <Navigate to="/login" />;
 };
 

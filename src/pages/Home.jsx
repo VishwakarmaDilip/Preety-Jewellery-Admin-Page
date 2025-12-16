@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import AnalyticCard from "../components/AnalyticCard";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOrders, fetchSummary } from "../features/ApiCalls";
+import { checkOwnerAuth, fetchOrders, fetchSummary } from "../features/ApiCalls";
 import * as Icon from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Invoice from "./Invoice";

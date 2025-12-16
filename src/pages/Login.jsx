@@ -4,6 +4,8 @@ import * as Icon from "react-feather";
 import Button from "../components/Button";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { checkOwnerAuth } from "../features/ApiCalls";
 
 const Login = () => {
   const {
@@ -15,6 +17,7 @@ const Login = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -22,7 +25,7 @@ const Login = () => {
 
   const submit = async (data) => {
     try {
-      const response = await fetch(`https://api.devbydilip.cloud/api/v1/owner/login`, {
+      const response = await fetch(`http://localhost:3000/api/v1/owner/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,6 +37,7 @@ const Login = () => {
       if (response.status < 300){
         reset();
       toast.success("Logged In");
+      dispatch(checkOwnerAuth())
       navigate("/");
       } else {
         toast.error("Invalid credentials or something went wrong");
