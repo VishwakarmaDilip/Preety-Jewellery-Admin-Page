@@ -8,6 +8,7 @@ const PrivateRoute = () => {
   const loading = useSelector((state) => state.owner.loading)
 
   if (loading) return <div>Loading...</div>;
+  
   return token ? <Outlet/> : <Navigate to="/login" />;
 };
 

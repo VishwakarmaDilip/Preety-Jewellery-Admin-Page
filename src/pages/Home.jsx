@@ -93,21 +93,21 @@ const Home = () => {
   };
 
   return (
-    <div className="px-8 py-3">
+    <div className="px-3 xs:px-8 py-3">
       {orderId && (
         <div ref={invoiceRef} className={`absolute right-full`}>
           <Invoice orderId={orderId} />
         </div>
       )}
       {/* Page title */}
-      <h1 className="font-bold text-2xl">Dashboard</h1>
-      <div className="p-5 flex flex-col gap-12">
+      <h1 className="font-bold text-2xl mb-4 xs:mb-0">Dashboard</h1>
+      <div className="p-2 xs:p-5 flex flex-col gap-12">
         {/* Analytic */}
         <div className="flex flex-col gap-4">
           {/* Revenue */}
           <div className="bg-white flex flex-col rounded-xl">
             <h2 className="text-xl font-semibold ml-5 mt-2">Revenue</h2>
-            <div className="flex items-center justify-evenly p-5">
+            <div className="grid grid-cols-2 gap-2 xs:flex items-center justify-evenly p-3 xs:p-5">
               <AnalyticCard
                 title={"Today"}
                 achieved={Number(ORSummary?.today?.revenue).toLocaleString()}
@@ -143,8 +143,8 @@ const Home = () => {
 
           {/* Orders */}
           <div className="bg-white flex flex-col rounded-xl">
-            <h2 className="text-lg font-semibold ml-5 mt-2">Orders</h2>
-            <div className="flex items-center justify-evenly p-5">
+            <h2 className="text-xl font-semibold ml-5 mt-2">Orders</h2>
+            <div className="grid grid-cols-2 gap-2 xs:flex items-center justify-evenly p-3 xs:p-5">
               <AnalyticCard
                 title={"Today"}
                 achieved={Number(ORSummary?.today?.orders).toLocaleString()}
@@ -172,10 +172,10 @@ const Home = () => {
         {/* Recent Orders */}
         <div>
           <h2 className="text-xl font-bold mt-2">Recent Order</h2>
-          <div className="bg-white rounded-lg overflow-hidden mx-5 my-2 mt-5">
+          <div className="bg-white rounded-lg overflow-hidden xs:mx-5 my-2 mt-5">
             {/* Heading */}
-            <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-8">
-              <li>
+            <ul className="bg-gray-200 px-2 xs:px-6 py-3 font-semibold grid grid-cols-8 text-[0.6rem] xs:text-base">
+              <li className="w-10 xs:w-20">
                 <p>Order No.</p>
               </li>
               <li>
@@ -200,7 +200,7 @@ const Home = () => {
               {orders?.map((order) => {
                 return (
                   <NavLink to={`/orders/${order._id}`} key={order?._id}>
-                    <ul className="grid grid-cols-8 pr-3 py-3 pl-6 border-b border-gray-200">
+                    <ul className="grid grid-cols-8 pr-3 py-3 pl-2 xs:pl-6 border-b border-gray-200 text-[0.6rem] xs:text-base">
                       <li>
                         <p>{order?.orderId}</p>
                       </li>
@@ -236,7 +236,7 @@ const Home = () => {
                             : order.status}
                         </p>
                       </li>
-                      <li className="flex gap-3">
+                      <li className="flex flex-col xs:flex-row pl-2 xs:pl-0 gap-3">
                         <div
                           onClick={(e) => {
                             e.preventDefault();

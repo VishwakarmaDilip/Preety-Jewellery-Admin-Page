@@ -2,5 +2,7 @@
 
 @theme{
   --color-theme: #967203;
-  --color-logo: #967203
+  --color-logo: #967203;
+
+  --breakpoint-xs: 480px;
 }

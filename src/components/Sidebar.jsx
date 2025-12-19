@@ -13,7 +13,7 @@ const Sidebar = () => {
   };
   const handleLogout = () => {
     try {
-      fetch(`http://localhost:3000/api/v1/owner/logout`, {
+      fetch(`https://api.devbydilip.cloud/api/v1/owner/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -25,7 +25,7 @@ const Sidebar = () => {
   };
   return (
     <div
-      className={`w-56 flex flex-col justify-between items-center bg-white h-screen shadow-xs fixed top-0 py-4 px-2 ${
+      className={`w-56 flex flex-col justify-between items-center bg-white h-dvh xs:h-screen shadow-xs absolute xs:fixed top-0 py-4 px-2 ${
         sidebar ? "left-0" : "-left-56"
       } transition-all ease-in-out z-10`}
     >

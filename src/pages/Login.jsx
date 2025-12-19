@@ -25,7 +25,7 @@ const Login = () => {
 
   const submit = async (data) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/owner/login`, {
+      const response = await fetch(`https://api.devbydilip.cloud/api/v1/owner/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,8 +47,8 @@ const Login = () => {
     }
   };
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className=" h-92 w-92 flex flex-col items-center justify-center gap-10">
+    <div className="flex items-center justify-center h-screen px-10 xs:px-0 pb-32 xs:pb-0">
+      <div className="h-92 w-92 flex flex-col items-center justify-center gap-10">
         <h1 className="font-bold text-4xl text-[#967203]">Preety Jewellery</h1>
 
         <form
