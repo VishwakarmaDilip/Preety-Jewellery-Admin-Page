@@ -174,7 +174,7 @@ const Home = () => {
           <h2 className="text-xl font-bold mt-2">Recent Order</h2>
           <div className="bg-white rounded-lg overflow-hidden xs:mx-5 my-2 mt-5">
             {/* Heading */}
-            <ul className="bg-gray-200 px-2 xs:px-6 py-3 font-semibold grid grid-cols-8 text-[0.6rem] xs:text-base">
+            <ul className="bg-gray-200 px-2 xs:px-6 py-3 font-semibold hidden xs:grid grid-cols-8 text-[0.6rem] xs:text-base">
               <li className="w-10 xs:w-20">
                 <p>Order No.</p>
               </li>
@@ -200,27 +200,28 @@ const Home = () => {
               {orders?.map((order) => {
                 return (
                   <NavLink to={`/orders/${order._id}`} key={order?._id}>
-                    <ul className="grid grid-cols-8 pr-3 py-3 pl-2 xs:pl-6 border-b border-gray-200 text-[0.6rem] xs:text-base">
-                      <li>
+                    <ul className="grid grid-cols-3 xs:grid-cols-8 pr-3 py-3 pl-2 xs:pl-6 border-b border-gray-200">
+                      <li className="flex xs:col-start-1 xs:col-end-2 col-start-2 col-end-4 place-self-end xs:place-self-start font-semibold xs:font-normal">
+                        <p className="xs:hidden">Order ID:</p>
                         <p>{order?.orderId}</p>
                       </li>
-                      <li>
-                        <p className="font-semibold">
+                      <li className="xs:row-start-1 xs:col-start-2 xs:row-end-2 row-end-4 col-start-3 row-start-2 xs:place-self-start place-self-center flex flex-col items-center xs:items-start">
+                        <p className="font-bold xs:font-semibold text-lg xs:text-base">
                           ₹{Number(order?.netAmount).toLocaleString()}
                         </p>
-                        <p>{order?.paymentType}</p>
+                        <p className="xs:text-base text-sm">{order?.paymentType}</p>
                       </li>
-                      <li className="col-start-3 col-end-5">
+                      <li className="xs:col-start-3 xs:col-end-5 col-start-1 col-end-3 xs:text-base text-sm">
                         <p>
                           {new Intl.DateTimeFormat("en-IN", option)
                             .format(new Date(order?.createdAt))
                             .replace(/am|pm/, (match) => match.toUpperCase())}
                         </p>
                       </li>
-                      <li className="col-start-5 col-end-7">
+                      <li className="xs:col-start-5 xs:col-end-7 xs:row-start-1 row-start-2 col-start-1 col-end-3 xs:font-normal font-semibold xs:text-base text-lg">
                         <p>{order?.customer?.fullName}</p>
                       </li>
-                      <li>
+                      <li className="row-start-1 col-start-1 xs:col-start-7 xs:row-start-1">
                         <p
                           className={`${
                             order?.status === "Placed" ||
@@ -236,7 +237,7 @@ const Home = () => {
                             : order.status}
                         </p>
                       </li>
-                      <li className="flex flex-col xs:flex-row pl-2 xs:pl-0 gap-3">
+                      <li className="flex pl-2 xs:pl-0 gap-3 xs:col-start-8 xs:col-end-8 col-start-1 col-end-4 xs:place-self-start place-self-center mt-4 xs:mt-0">
                         <div
                           onClick={(e) => {
                             e.preventDefault();
@@ -246,16 +247,20 @@ const Home = () => {
                               setOrderId("");
                             }, 50);
                           }}
+                          className="bg-blue-500 xs:bg-transparent xs:text-black text-white xs:w-6 w-40 xs:h-6 h-8 items-center flex justify-center rounded-lg gap-2 font-bold"
                         >
                           <Icon.Printer />
+                          <p className="xs:hidden">Print Invoice</p>
                         </div>
                         <div
                           onClick={(e) => {
                             e.preventDefault();
                             navigate(`/invoice/${order._id}`);
                           }}
+                          className="bg-blue-500 xs:bg-transparent xs:text-black text-white xs:w-6 w-40 xs:h-6 h-8 items-center flex justify-center rounded-lg gap-2 font-bold"
                         >
                           <Icon.Eye />
+                          <p className="xs:hidden">View Invoice</p>
                         </div>
                       </li>
                     </ul>
