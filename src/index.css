@@ -5,4 +5,6 @@
   --color-logo: #967203;
 
   --breakpoint-xs: 480px;
+  
+  --shadow-boxShadowBorder2: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }

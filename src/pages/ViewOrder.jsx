@@ -11,7 +11,9 @@ const ViewOrder = () => {
   const dispatch = useDispatch();
   const [refresh, setRefresh] = useState(false);
   const fetchedOrder = useSelector((state) => state.order.oneOrder);
-  const isReload = useSelector((state) => state.order.reload)
+  const isReload = useSelector((state) => state.order.reload);
+  const [actionBar, setActionBar] = useState(false);
+
   const option = {
     year: "numeric",
     month: "long",
@@ -19,7 +21,7 @@ const ViewOrder = () => {
   };
 
   useEffect(() => {
-    dispatch(getOrder(order_id.orderId)); 
+    dispatch(getOrder(order_id.orderId));
   }, [isReload]);
 
   const orderDate = fetchedOrder?.createdAt
@@ -43,21 +45,29 @@ const ViewOrder = () => {
     }
   };
 
+  const toggleActionBar = () => {
+    setActionBar((pre) => !pre);
+  };
+
   return (
-    <div className="mt-16 p-5 px-32">
+    <div className="mt-10 xs:mt-16 xs:p-5 px-4 xs:px-32">
       <div className="bg-white p-4 rounded-md">
         {/* page head */}
         <div className="">
           <div className="flex justify-between items-center">
             {/* ID */}
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-xl xs:text-3xl font-bold">
               Order ID :<span> {fetchedOrder?.orderId}</span>
             </h1>
 
             {/* invoice and trackOrder */}
-            <div className="flex gap-6">
+            <div className="xs:flex gap-6 hidden">
               {/* Invoice */}
-              <NavLink to={`/invoice/${order_id.orderId}`} target="_blank" className="flex items-center justify-center gap-2 shadow-boxShadowBorder2 rounded-lg w-28 h-10">
+              <NavLink
+                to={`/invoice/${order_id.orderId}`}
+                target="_blank"
+                className="flex items-center justify-center gap-2 shadow-boxShadowBorder2 rounded-lg w-28 h-10"
+              >
                 <Icon.FileText />
                 <p>Invoice</p>
               </NavLink>
@@ -68,22 +78,35 @@ const ViewOrder = () => {
                 <Icon.LocateFixed />
               </div>
             </div>
+
+            {screen.width < 500 && (
+              <div>
+                <Button
+                  className={
+                    "bg-blue-600 h-8 text-sm rounded-lg flex items-center justify-center"
+                  }
+                  onClick={() => toggleActionBar()}
+                >
+                  <p>More Action</p>
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* order date and arrival estimation */}
-          <div className="flex px-3 py-2 border-b-2 border-gray-300">
+          <div className="flex flex-col xs:flex-row xs:px-3 py-2 border-b-2 border-gray-300">
             <div className="flex gap-2">
               <p className="text-gray-400 font-semibold">Order Date :</p>
-              <p className="border-r-2 border-black pr-2 mr-2">{orderDate}</p>
+              <p className="xs:border-r-2 border-black pr-2 mr-2">{orderDate}</p>
             </div>
             {fetchedOrder?.status != "Cancelled" ? (
-              <div className="flex gap-1 font-semibold text-green-500">
-                <Icon.Truck />
+              <div className="flex gap-1 font-semibold text-sm xs:text-base text-green-500">
+                <Icon.Truck className="size-5 xs:size-6" />
                 <p>Estimated Delivery :</p>
                 <p>{fetchedOrder?.delivery}</p>
               </div>
             ) : (
-              <div className="text-red-400 font-bold bg-red-100 px-4 rounded-full">
+              <div className="text-red-400 font-bold bg-red-100 px-4 rounded-full flex justify-center">
                 {fetchedOrder?.status}
               </div>
             )}
@@ -91,7 +114,7 @@ const ViewOrder = () => {
         </div>
 
         {/* page body : order detail*/}
-        <div className="py-4 px-10">
+        <div className="py-4 xs:px-10">
           {fetchedOrder?.products?.map((item) => (
             <div
               key={item?._id}
@@ -125,7 +148,7 @@ const ViewOrder = () => {
 
         {/* orders other details */}
         <div>
-          <div className="border-t-2 border-b-2 border-gray-300 flex justify-between px-6 py-4">
+          <div className="border-t-2 border-b-2 border-gray-300 flex justify-between xs:px-6 py-4 flex-col xs:flex-row space-y-0">
             {/* Payment Type */}
             <div>
               <h3 className="text-lg font-semibold">Payment</h3>
@@ -172,7 +195,11 @@ const ViewOrder = () => {
       </div>
       <div className=" h-10 mt-2 flex gap-4">
         <Button
-          className={fetchedOrder?.status === "Cancelled"? `bg-gray-400 w-1/2` : `bg-red-700 w-1/2 hover:bg-red-800 active:bg-red-900`}
+          className={
+            fetchedOrder?.status === "Cancelled"
+              ? `bg-gray-400 w-1/2`
+              : `bg-red-700 w-1/2 hover:bg-red-800 active:bg-red-900`
+          }
           disabled={fetchedOrder?.status != "Cancelled" ? false : true}
           onClick={() => {
             cancelOrder(order_id);
@@ -181,12 +208,49 @@ const ViewOrder = () => {
           Cancel
         </Button>
         <Button
-          className={fetchedOrder?.status === "Cancelled"? `bg-gray-400 w-1/2` : "bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"}
+          className={
+            fetchedOrder?.status === "Cancelled"
+              ? `bg-gray-400 w-1/2`
+              : "bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"
+          }
           disabled={fetchedOrder?.status != "Cancelled" ? false : true}
         >
           Accept
         </Button>
       </div>
+
+      {screen.width < 500 && (
+        <div
+          className={`bg-white shadow-boxShadowBorder2 fixed px-3 pt-3 w-full left-0 ${
+            actionBar ? "bottom-0" : "-bottom-96"
+          } transition-all ease-in-out`}
+        >
+          <ul className="flex flex-col">
+            <li className="pb-6 flex justify-between items-center pr-2">
+              <p className="font-semibold">Need Help ?</p>
+              <Icon.X onClick={() => toggleActionBar()} />
+            </li>
+            <li className="border-b pb-3 pl-2">
+              <NavLink className={"flex gap-2"}>
+                <Icon.FileText />
+                <p>Print Invoice</p>
+              </NavLink>
+            </li>
+            <li className="border-b py-3 pl-2">
+              <NavLink className={"flex gap-2"}>
+                <Icon.LocateFixed />
+                <p>Track Your Order</p>
+              </NavLink>
+            </li>
+            {/* <li className="border-b py-3 pl-2">
+              <NavLink className={"flex gap-2"}>
+                <Icon.ArrowLeftRight />
+                <p>Exchange Or Return</p>
+              </NavLink>
+            </li> */}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
