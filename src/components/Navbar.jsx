@@ -8,7 +8,7 @@ const Navbar = () => {
     setSidebar(!sidebar)
   }
   return (
-    <nav className='flex w-full h- justify-between p-5 bg-white shadow fixed top-0'>
+    <nav className='flex w-full justify-between p-5 bg-white shadow fixed top-0'>
         <Icon.Menu size={30} onClick={()=> handleSidebar()}/>
         <Icon.User size={30}/>
     </nav>

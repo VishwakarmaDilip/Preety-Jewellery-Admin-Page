@@ -50,7 +50,7 @@ const ViewOrder = () => {
   };
 
   return (
-    <div className="mt-10 xs:mt-16 xs:p-5 px-4 xs:px-32">
+    <div className="xs:mt-16 xs:p-5 px-4 xs:px-32">
       <div className="bg-white p-4 rounded-md">
         {/* page head */}
         <div className="">
@@ -97,7 +97,9 @@ const ViewOrder = () => {
           <div className="flex flex-col xs:flex-row xs:px-3 py-2 border-b-2 border-gray-300">
             <div className="flex gap-2">
               <p className="text-gray-400 font-semibold">Order Date :</p>
-              <p className="xs:border-r-2 border-black pr-2 mr-2">{orderDate}</p>
+              <p className="xs:border-r-2 border-black pr-2 mr-2">
+                {orderDate}
+              </p>
             </div>
             {fetchedOrder?.status != "Cancelled" ? (
               <div className="flex gap-1 font-semibold text-sm xs:text-base text-green-500">
@@ -148,7 +150,7 @@ const ViewOrder = () => {
 
         {/* orders other details */}
         <div>
-          <div className="border-t-2 border-b-2 border-gray-300 flex justify-between xs:px-6 py-4 flex-col xs:flex-row space-y-0">
+          <div className="border-t-2 border-b-2 border-gray-300 flex justify-between xs:px-6 py-4 flex-col-reverse xs:flex-row xs:gap-0 gap-4">
             {/* Payment Type */}
             <div>
               <h3 className="text-lg font-semibold">Payment</h3>
@@ -156,7 +158,7 @@ const ViewOrder = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="w-52">
+            <div className="xs:w-52">
               <h3 className="font-semibold text-lg">Order Summary</h3>
               <div className="pl-2">
                 <div className="flex justify-between text-lg">
@@ -179,10 +181,14 @@ const ViewOrder = () => {
             </div>
           </div>
 
-          <div className="flex justify-between px-6 py-4">
+          <div className="flex justify-between xs:px-6 py-4">
             {/* Shipping Address */}
             <div>
               <h3 className="text-lg font-semibold">Delivery</h3>
+              <p className="pl-2">
+                {fetchedOrder?.address?.[0]?.firstName}{" "}
+                {fetchedOrder?.address?.[0]?.lastName}
+              </p>
               <p className="pl-2">
                 {fetchedOrder?.address?.[0]?.address},{" "}
                 {fetchedOrder?.address?.[0]?.city} -{" "}
@@ -239,7 +245,7 @@ const ViewOrder = () => {
             <li className="border-b py-3 pl-2">
               <NavLink className={"flex gap-2"}>
                 <Icon.LocateFixed />
-                <p>Track Your Order</p>
+                <p>Track the Order</p>
               </NavLink>
             </li>
             {/* <li className="border-b py-3 pl-2">

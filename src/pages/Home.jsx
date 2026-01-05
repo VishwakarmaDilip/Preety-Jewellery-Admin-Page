@@ -201,8 +201,8 @@ const Home = () => {
                 return (
                   <NavLink to={`/orders/${order._id}`} key={order?._id}>
                     <ul className="grid grid-cols-3 xs:grid-cols-8 pr-3 py-3 pl-2 xs:pl-6 border-b border-gray-200">
-                      <li className="flex xs:col-start-1 xs:col-end-2 col-start-2 col-end-4 place-self-end xs:place-self-start font-semibold xs:font-normal">
-                        <p className="xs:hidden">Order ID:</p>
+                      <li className="flex gap-1 xs:col-start-1 xs:col-end-2 col-start-2 col-end-4 place-self-end xs:place-self-start font-semibold xs:font-normal">
+                        <p className="xs:hidden">Order ID :</p>
                         <p>{order?.orderId}</p>
                       </li>
                       <li className="xs:row-start-1 xs:col-start-2 xs:row-end-2 row-end-4 col-start-3 row-start-2 xs:place-self-start place-self-center flex flex-col items-center xs:items-start">

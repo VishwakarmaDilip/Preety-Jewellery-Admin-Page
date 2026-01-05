@@ -8,7 +8,7 @@ const Layout = () => {
   let [sidebar, setSidebar] = useState(window.innerWidth >= 640 ? true : false);
   return (
     <sharedContext.Provider value={{ sidebar, setSidebar }}>
-      <div className="">
+      <div>
         <Navbar />
         <Sidebar />
         <div

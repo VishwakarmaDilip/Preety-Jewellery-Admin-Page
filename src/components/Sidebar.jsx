@@ -11,6 +11,11 @@ const Sidebar = () => {
   const handleSidebar = () => {
     setSidebar(!sidebar);
   };
+  const handleMobileSidebar = () => {
+    if (screen.width < 500) {
+      setSidebar(!sidebar);
+    }
+  };
   const handleLogout = () => {
     try {
       fetch(`https://api.devbydilip.cloud/api/v1/owner/logout`, {
@@ -43,6 +48,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to={"/"}
+                onClick={() => handleMobileSidebar()}
                 className={({ isActive }) =>
                   isActive
                     ? "text-theme flex items-center gap-2 mt-5"
@@ -56,6 +62,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to={"/products"}
+                onClick={() => handleMobileSidebar()}
                 className={({ isActive }) =>
                   isActive
                     ? "text-theme flex items-center gap-2 mt-5"
@@ -69,6 +76,7 @@ const Sidebar = () => {
             <li>
               <NavLink
                 to={"/Orders"}
+                onClick={() => handleMobileSidebar()}
                 className={({ isActive }) =>
                   isActive
                     ? "text-theme flex items-center gap-2 mt-5"

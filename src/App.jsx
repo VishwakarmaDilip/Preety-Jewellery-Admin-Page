@@ -6,7 +6,7 @@ import ViewProduct from "./pages/ViewProduct";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/Login";
 import Orders from "./pages/Orders";
-import ViewOrder from "./pages/viewOrder";
+import ViewOrder from "./pages/ViewOrder";
 import Invoice from "./pages/Invoice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";

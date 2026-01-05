@@ -312,6 +312,8 @@ const Products = () => {
           </div>
 
           {/* Products */}
+          {
+            screen.width > 500 ? (
           <div className="bg-white rounded-lg overflow-hidden my-2 mt-5">
             {/* Heading */}
             <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-8">
@@ -450,6 +452,10 @@ const Products = () => {
               </div>
             )}
           </div>
+            ): (
+              <div>none</div>
+            )
+          }
         </div>
       </div>
     </div>
