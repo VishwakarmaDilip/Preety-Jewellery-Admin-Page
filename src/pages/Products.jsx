@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import Button from "../components/Button";
 import * as Icon from "react-feather";
+import * as Icon2 from "lucide-react";
 import Input from "../components/Input";
 import { useForm } from "react-hook-form";
 import AddProduct from "../components/AddProduct";
@@ -24,6 +25,7 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortType, setSortType] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [filterBox, setFilterBox] = useState(false);
 
   // Fetch products from the API
   useEffect(() => {
@@ -33,7 +35,7 @@ const Products = () => {
     } else {
       page = 1; // Reset to page 1 if search term is not empty
     }
-    let delay = (changePage || categoryId) ? 0 : 700; // Delay for debounce effect
+    let delay = changePage || categoryId ? 0 : 700; // Delay for debounce effect
     const callApi = setTimeout(() => {
       setLoading(true);
       const fetchData = async () => {
@@ -47,10 +49,12 @@ const Products = () => {
           );
 
           const responseData = await response.json();
-          const allProducts = responseData.data.fetchedProduct.map((product) => ({
-            ...product,
-            selected: false, // Initialize selected state for each product
-          }) );
+          const allProducts = responseData.data.fetchedProduct.map(
+            (product) => ({
+              ...product,
+              selected: false, // Initialize selected state for each product
+            })
+          );
           const pageData = responseData.data.pageInfo;
 
           setProducts(allProducts);
@@ -133,38 +137,43 @@ const Products = () => {
   };
 
   const handleBulkDelete = () => {
-    const selectedProductIds = products.filter((product) => product.selected).map((product) => product._id)
+    const selectedProductIds = products
+      .filter((product) => product.selected)
+      .map((product) => product._id);
 
-    let deleted = null
+    let deleted = null;
 
-    confirm("Are you sure you want to delete selected products?") && selectedProductIds.forEach((id) => {
-      fetch(`https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      })
-        .then((response) => {
-          if (response.ok) {
-            deleted = true;
-          } else {
-            toast.error("Failed to delete product");
+    confirm("Are you sure you want to delete selected products?") &&
+      selectedProductIds.forEach((id) => {
+        fetch(
+          `https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`,
+          {
+            method: "DELETE",
+            credentials: "include",
           }
-        })
-        .catch((error) => {
-          console.error("Error deleting product:", error);
-          toast.error("An error occurred while deleting the product");
-        })
-        .finally(() => {
-          setRefresh(!refresh);
-        });
-    })
+        )
+          .then((response) => {
+            if (response.ok) {
+              deleted = true;
+            } else {
+              toast.error("Failed to delete product");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting product:", error);
+            toast.error("An error occurred while deleting the product");
+          })
+          .finally(() => {
+            setRefresh(!refresh);
+          });
+      });
 
-    if(deleted) {
+    if (deleted) {
       toast.success("Selected products deleted successfully");
-    } else if(deleted === false) {
+    } else if (deleted === false) {
       toast.error("some products could not be deleted");
     }
-    
-  }
+  };
 
   const toggleAddPage = () => {
     window.scrollTo(0, 0);
@@ -193,7 +202,15 @@ const Products = () => {
   document.body.style.overflow = AddProductPage ? "hidden" : "auto";
 
   return (
-    <div className="px-8 py-3">
+    <div className="xs:px-8 py-3 px-4">
+      {screen.width < 500 && (
+        <div
+          className={`bg-black w-dvw h-dvh absolute top-0 right-0 opacity-35 z-10 ${
+            filterBox ? "block" : "hidden"
+          }`}
+        ></div>
+      )}
+
       <h1 className="font-bold text-2xl">Products</h1>
 
       {/* add product form */}
@@ -209,11 +226,14 @@ const Products = () => {
           setProductId={setProductId}
         />
       </div>
-      <div className="p-5 flex flex-col gap-8">
+      <div className="xs:p-5 py-5 flex flex-col gap-8">
         {/* quick action */}
-        <div className="bg-white p-5 rounded-lg flex justify-end">
-          <div className="flex gap-4">
-            <Button onClick={() => handleBulkDelete()} className="bg-rose-700 hover:bg-rose-800 active:bg-rose-900">
+        <div className=" xs:bg-white xs:p-5 rounded-lg flex xs:justify-end justify-center">
+          <div className="flex xs:gap-4 gap-10">
+            <Button
+              onClick={() => handleBulkDelete()}
+              className="bg-rose-700 hover:bg-rose-800 active:bg-rose-900"
+            >
               Delete In Bulk
             </Button>
             <Button
@@ -226,11 +246,29 @@ const Products = () => {
           </div>
         </div>
 
+        {/* Mobile Search Bar */}
+        {screen.width < 500 && (
+          <div className="relative z-0">
+            <Icon.Search size={20} className="absolute top-2 left-1.5" />
+            <Input
+              type="search"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
+              className={`bg-white w-full h-10 pl-9 pr-1.5 rounded-xl-lg shadow-boxShadowBorder2`}
+              placeholder="Search Product..."
+            />
+          </div>
+        )}
+
         {/* order box */}
         <div>
           {/* filter box */}
-          <div className="bg-white rounded-lg p-5 flex justify-between ">
-            <div className="relative">
+          <div
+            className={`bg-white rounded-lg p-5 flex xs:flex-row flex-col gap-6 xs:gap-0 justify-between xs:static absolute xs:top-0 top-48 xs:right-0 ${
+              filterBox ? "right-10" : "right-full"
+            } xs:w-full transition-all ease-in-out w-4/5 z-10`}
+          >
+            <div className="relative hidden xs:block">
               <Icon.Search size={20} className="absolute top-2 left-1.5" />
               <Input
                 type="search"
@@ -243,11 +281,19 @@ const Products = () => {
               />
             </div>
 
-            <form className="flex gap-14" onSubmit={handleSubmit(onSubmit)}>
-              <div className="flex gap-6">
+            <div className="flex justify-between xs:hidden">
+              <p className="font-semibold text-xl">Filter Products</p>
+              <Icon.X onClick={() => setFilterBox((prev) => !prev)} />
+            </div>
+
+            <form
+              className="flex gap-14 xs:flex-row flex-col"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <div className="flex xs:flex-row flex-col gap-6">
                 <div className="relative">
                   <select
-                    className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg ${
+                    className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-full ${
                       sidebar ? "md:w-56" : "md:w-60"
                     } transition-all ease-in-out`}
                     {...register("category")}
@@ -268,7 +314,7 @@ const Products = () => {
 
                 <div className="relative">
                   <select
-                    className="appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-60"
+                    className="appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-full xs:w-60"
                     {...register("sortBy")}
                   >
                     <option value="createdAt">Short</option>
@@ -285,15 +331,22 @@ const Products = () => {
                 </div>
               </div>
 
-              <div className="flex gap-6">
+              <div className="flex gap-6 xs:flex-row flex-row-reverse">
                 <Button
                   type="submit"
                   disabled={loading}
                   className={
-                    loading ? "bg-gray-300 w-40" : "bg-violet-700 w-40"
+                    loading
+                      ? "bg-gray-300 w-40"
+                      : "xs:bg-violet-700 bg-green-500 w-40"
                   }
+                  onClick={() => {
+                    if (screen.width < 500) {
+                      setFilterBox((prev) => !prev);
+                    }
+                  }}
                 >
-                  Filter
+                  {screen.width < 500 ? <p>Apply</p> : <p>Filter</p>}
                 </Button>
                 <Button
                   onClick={() => {
@@ -302,6 +355,9 @@ const Products = () => {
                       category: "",
                       sortBy: "createdAt",
                     });
+                    if (screen.width < 500) {
+                      setFilterBox((prev) => !prev);
+                    }
                   }}
                   className="bg-red-600 w-40"
                 >
@@ -312,152 +368,312 @@ const Products = () => {
           </div>
 
           {/* Products */}
-          {
-            screen.width > 500 ? (
-          <div className="bg-white rounded-lg overflow-hidden my-2 mt-5">
-            {/* Heading */}
-            <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-8">
-              <li className="flex gap-2 items-center">
+          {screen.width > 500 ? (
+            <div className="bg-white rounded-lg overflow-hidden my-2 mt-5">
+              {/* Heading */}
+              <ul className="bg-gray-200 px-6 py-3 font-semibold grid grid-cols-8">
+                <li className="flex gap-2 items-center">
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                  />
+                  <p>PID</p>
+                </li>
+                <li className="col-start-2 col-end-4">
+                  <p>Product Name</p>
+                </li>
+                <li>
+                  <p>Category</p>
+                </li>
+                <li>
+                  <p>Price</p>
+                </li>
+                <li>
+                  <p>Stock</p>
+                </li>
+                <li>
+                  <p>View</p>
+                </li>
+                <li>
+                  <p>Action</p>
+                </li>
+              </ul>
+
+              {/* Product rows */}
+              {products?.length > 0 ? (
+                products?.map((product) => (
+                  <ul
+                    className="grid grid-cols-8 px-6 py-3 border-b border-gray-200"
+                    key={product?._id}
+                  >
+                    <li className="flex gap-2 items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={!!product?.selected}
+                        onChange={() => handleSelectItem(product?._id)}
+                        className=" cursor-pointer"
+                      />
+                      <p onClick={() => handleSelectItem(product?._id)}>
+                        {product?.productId}
+                      </p>
+                    </li>
+                    <li className="col-start-2 col-end-4 flex items-center gap-3">
+                      <img src={product?.image[0]} alt="" className="h-5 w-5" />
+                      <p>{product?.productName}</p>
+                    </li>
+                    <li>
+                      <p>{product?.category[0]?.categoryName}</p>
+                    </li>
+                    <li>
+                      <p>₹{product?.price}</p>
+                    </li>
+                    <li>
+                      <p>{product?.quantity}</p>
+                    </li>
+                    <li>
+                      <NavLink to={`/products/${product?._id}`}>
+                        <Icon.Eye size={20} />
+                      </NavLink>
+                    </li>
+                    <li className="flex gap-3 cursor-pointer">
+                      <Icon.Edit
+                        onClick={() => {
+                          setProductId(product?._id);
+                          toggleAddPage();
+                        }}
+                        size={20}
+                        className="hover:text-green-500"
+                      />
+                      <Icon.Trash2
+                        size={20}
+                        onClick={() => handleDeleteProduct(product?._id)}
+                        className="hover:text-red-600"
+                      />
+                    </li>
+                  </ul>
+                ))
+              ) : (
+                <div className="text-center py-5">
+                  <p className="text-gray-500">No products found</p>
+                </div>
+              )}
+
+              {products?.length > 0 && (
+                <div className="bg-gray-200 px-6 py-3 flex items-center justify-between text-sm font-medium">
+                  {/* Left: Showing results info */}
+                  <p className="text-gray-700">
+                    Showing page{" "}
+                    <span className="text-gray-900">{pageInfo?.page}</span> of{" "}
+                    <span className="text-gray-900">
+                      {pageInfo?.totalPages}
+                    </span>{" "}
+                    pages (
+                    <span className="text-gray-900">
+                      {pageInfo?.totalProduct}
+                    </span>{" "}
+                    Products)
+                  </p>
+
+                  {/* Right: Prev / Next buttons */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setPageNumber(pageInfo.page - 1);
+                        setChangePage(true);
+                      }}
+                      disabled={pageInfo.page === 1}
+                      className={`px-3 py-1 rounded ${
+                        pageInfo.page === 1
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-white hover:bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      Prev
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPageNumber(pageInfo.page + 1);
+                        setChangePage(true);
+                      }}
+                      disabled={pageInfo.page === pageInfo.totalPages}
+                      className={`px-3 py-1 rounded ${
+                        pageInfo.page === pageInfo.totalPages
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-white hover:bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div>
+              <div className="flex gap-2 items-center mb-3 ml-2">
                 <input
                   type="checkbox"
                   checked={selectAll}
                   onChange={handleSelectAll}
                 />
-                <p>PID</p>
-              </li>
-              <li className="col-start-2 col-end-4">
-                <p>Product Name</p>
-              </li>
-              <li>
-                <p>Category</p>
-              </li>
-              <li>
-                <p>Price</p>
-              </li>
-              <li>
-                <p>Stock</p>
-              </li>
-              <li>
-                <p>View</p>
-              </li>
-              <li>
-                <p>Action</p>
-              </li>
-            </ul>
+                <p>Select All</p>
+              </div>
+              <div className="bg-white rounded-lg overflow-hidden">
+                {/* Products */}
+                {products?.length > 0 ? (
+                  products?.map((product) => (
+                    <div
+                      className="pt-9 pl-4 pr-4 pb-4 flex gap-4 flex-col border-b w-full border-gray-200 relative"
+                      key={product?._id}
+                    >
+                      <div className="absolute top-2 left-2">
+                        <input
+                          type="checkbox"
+                          checked={!!product?.selected}
+                          onChange={() => handleSelectItem(product?._id)}
+                          className=" cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex justify-between">
+                        <div className="flex gap-2">
+                          {/* image box */}
+                          <NavLink to={`/products/${product?._id}`}>
+                            <div className="w-24 h-24">
+                              <img
+                                src={product?.image[0]}
+                                alt=""
+                                className="h-full"
+                              />
+                            </div>
+                          </NavLink>
 
-            {/* Product rows */}
-            {products?.length > 0 ? (
-              products?.map((product) => (
-                <ul
-                  className="grid grid-cols-8 px-6 py-3 border-b border-gray-200"
-                  key={product?._id}
-                >
-                  <li className="flex gap-2 items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!product?.selected}
-                      onChange={() => handleSelectItem(product?._id)}
-                      className=" cursor-pointer"
-                    />
-                    <p onClick={() => handleSelectItem(product?._id)}>
-                      {product?.productId}
+                          {/* Product details */}
+                          <div className="flex flex-col justify-between font-semibold">
+                            <div className="flex text-lg gap-1">
+                              <p>PID :</p>
+                              <p>{product?.productId}</p>
+                            </div>
+
+                            <p>{product?.productName}</p>
+
+                            <div className="flex text-sm gap-1">
+                              <p>Category :</p>
+                              <p>{product?.category[0]?.categoryName}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* price and stock */}
+                        <div className="flex flex-col justify-center items-center font-bold text-xl">
+                          <p>₹{product?.price}</p>
+
+                          <div className="flex gap-1">
+                            <p>Stock :</p>
+                            <p>{product?.quantity}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex gap-3 w-full h-8">
+                          <div
+                            className="bg-blue-600 text-white font-semibold w-1/2 rounded-lg flex items-center justify-center gap-2 "
+                            onClick={() => {
+                              setProductId(product?._id);
+                              toggleAddPage();
+                            }}
+                          >
+                            <Icon.Edit
+                              size={20}
+                              className="hover:text-green-500"
+                            />
+                            <p>Edit</p>
+                          </div>
+
+                          <div
+                            className="bg-red-700 text-white font-semibold w-1/2 rounded-lg flex items-center justify-center gap-2 "
+                            onClick={() => handleDeleteProduct(product?._id)}
+                          >
+                            <Icon.Trash2
+                              size={20}
+                              className="hover:text-red-600"
+                            />
+                            <p>Delete</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-5">
+                    <p className="text-gray-500">No products found</p>
+                  </div>
+                )}
+
+                {products?.length > 0 && (
+                  <div className="bg-gray-200 p-3 flex items-center justify-between text-sm font-medium">
+                    {/* Left: Showing results info */}
+                    <p className="text-gray-700 text-xs">
+                      Showing page{" "}
+                      <span className="text-gray-900">{pageInfo?.page}</span> of{" "}
+                      <span className="text-gray-900">
+                        {pageInfo?.totalPages}
+                      </span>{" "}
+                      pages (
+                      <span className="text-gray-900">
+                        {pageInfo?.totalProduct}
+                      </span>{" "}
+                      Products)
                     </p>
-                  </li>
-                  <li className="col-start-2 col-end-4 flex items-center gap-3">
-                    <img src={product?.image[0]} alt="" className="h-5 w-5" />
-                    <p>{product?.productName}</p>
-                  </li>
-                  <li>
-                    <p>{product?.category[0]?.categoryName}</p>
-                  </li>
-                  <li>
-                    <p>₹{product?.price}</p>
-                  </li>
-                  <li>
-                    <p>{product?.quantity}</p>
-                  </li>
-                  <li>
-                    <NavLink to={`/products/${product?._id}`}>
-                      <Icon.Eye size={20} />
-                    </NavLink>
-                  </li>
-                  <li className="flex gap-3 cursor-pointer">
-                    <Icon.Edit
-                      onClick={() => {
-                        setProductId(product?._id);
-                        toggleAddPage();
-                      }}
-                      size={20}
-                      className="hover:text-green-500"
-                    />
-                    <Icon.Trash2
-                      size={20}
-                      onClick={() => handleDeleteProduct(product?._id)}
-                      className="hover:text-red-600"
-                    />
-                  </li>
-                </ul>
-              ))
-            ) : (
-              <div className="text-center py-5">
-                <p className="text-gray-500">No products found</p>
-              </div>
-            )}
 
-            {products?.length > 0 && (
-              <div className="bg-gray-200 px-6 py-3 flex items-center justify-between text-sm font-medium">
-                {/* Left: Showing results info */}
-                <p className="text-gray-700">
-                  Showing page{" "}
-                  <span className="text-gray-900">{pageInfo?.page}</span> of{" "}
-                  <span className="text-gray-900">{pageInfo?.totalPages}</span>{" "}
-                  pages (
-                  <span className="text-gray-900">
-                    {pageInfo?.totalProduct}
-                  </span>{" "}
-                  Products)
-                </p>
-
-                {/* Right: Prev / Next buttons */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setPageNumber(pageInfo.page - 1);
-                      setChangePage(true);
-                    }}
-                    disabled={pageInfo.page === 1}
-                    className={`px-3 py-1 rounded ${
-                      pageInfo.page === 1
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-white hover:bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    Prev
-                  </button>
-                  <button
-                    onClick={() => {
-                      setPageNumber(pageInfo.page + 1);
-                      setChangePage(true);
-                    }}
-                    disabled={pageInfo.page === pageInfo.totalPages}
-                    className={`px-3 py-1 rounded ${
-                      pageInfo.page === pageInfo.totalPages
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-white hover:bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    Next
-                  </button>
-                </div>
+                    {/* Right: Prev / Next buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setPageNumber(pageInfo.page - 1);
+                          setChangePage(true);
+                        }}
+                        disabled={pageInfo.page === 1}
+                        className={`px-3 py-1 rounded ${
+                          pageInfo.page === 1
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-white hover:bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        Prev
+                      </button>
+                      <button
+                        onClick={() => {
+                          setPageNumber(pageInfo.page + 1);
+                          setChangePage(true);
+                        }}
+                        disabled={pageInfo.page === pageInfo.totalPages}
+                        className={`px-3 py-1 rounded ${
+                          pageInfo.page === pageInfo.totalPages
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-white hover:bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-            ): (
-              <div>none</div>
-            )
-          }
+            </div>
+          )}
         </div>
       </div>
+
+      {screen.width < 500 && (
+        <div
+          className="absolute bottom-5 right-5 bg-white p-3 rounded-full shadow-boxShadowBorder2"
+          onClick={() => setFilterBox((prev) => !prev)}
+        >
+          <Icon.Filter size={30} />
+        </div>
+      )}
     </div>
   );
 };

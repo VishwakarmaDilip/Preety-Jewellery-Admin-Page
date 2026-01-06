@@ -220,7 +220,7 @@ const Orders = () => {
   // console.log(maxDate);
 
   return (
-    <div className="xs:px-8 px-4 xs:py-3">
+    <div className="xs:px-8 px-4 py-3">
       {screen.width < 500 && (
         <div
           className={`bg-black w-dvw h-dvh absolute top-0 right-0 opacity-35 z-10 ${
