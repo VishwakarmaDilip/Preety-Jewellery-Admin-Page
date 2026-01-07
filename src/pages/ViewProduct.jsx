@@ -70,7 +70,7 @@ const ViewProduct = () => {
   };
 
   return (
-    <div className="px-8 py-3 flex ">
+    <div className="xs:px-8 xs:py-3 px-4 flex xs:flex-row flex-col">
       {/* add product form */}
       <div
         className={`${
@@ -85,9 +85,9 @@ const ViewProduct = () => {
         />
       </div>
       {/*Product image */}
-      <div className="w-1/2 flex flex-col gap-10 py-10">
+      <div className="xs:w-1/2 flex flex-col gap-5 xs:gap-10 py-5 xs:py-10">
         {/* image */}
-        <div className="h-96 flex items-center justify-center">
+        <div className="xs:h-96 flex items-center justify-center">
           {viewImage && <img src={viewImage} alt="" className="h-full" />}
         </div>
 
@@ -97,7 +97,7 @@ const ViewProduct = () => {
             <div
               key={index}
               onClick={() => setViewImage(img)}
-              className={`h-20 cursor-pointer p-1 rounded transition-transform hover:scale-105 ${
+              className={`xs:h-20 h-14 cursor-pointer p-1 rounded transition-transform hover:scale-105 ${
                 viewImage === img
                   ? "border-4 border-blue-500"
                   : "border border-gray-300"
@@ -114,7 +114,7 @@ const ViewProduct = () => {
       </div>
 
       {/* product details */}
-      <div className="bg-white w-1/2 p-5 flex flex-col justify-between">
+      <div className="bg-white xs:w-1/2 p-5 xs:flex flex-col justify-between grid grid-cols-2 xs:gap-0 gap-2">
         <div>
           <p className="text-gray-400 text-xs">PID</p>
           <p className="text-base">{product?.productId}</p>
@@ -141,7 +141,7 @@ const ViewProduct = () => {
         </div>
 
         {/* buttons */}
-        <div className="flex gap-5">
+        <div className="flex gap-5 col-start-1 col-end-3 mt-2 xs:mt-0">
           <Button
             onClick={() => toggleAddPage()}
             className="bg-blue-400 w-1/2 hover:bg-blue-500 active:bg-blue-600"

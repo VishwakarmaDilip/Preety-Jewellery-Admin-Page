@@ -209,9 +209,9 @@ const AddProduct = ({
     }
   };
   return (
-    <div className="bg-[#F4F2F2] h-full w-6/7 absolute right-0">
+    <div className="bg-[#F4F2F2] h-full w-full xs:w-6/7 absolute right-0">
       {/* navigation */}
-      <nav className="bg-gray-200 flex justify-between p-5 ">
+      <nav className="bg-gray-200 flex justify-between p-5">
         <h2 className="font-bold text-lg">
           {productId ? "Edit Product" : "Add Product"}
         </h2>
@@ -234,23 +234,23 @@ const AddProduct = ({
       </nav>
       <form className="h-full" onSubmit={handleSubmit(onSubmit)}>
         <div className="h-4/5 overflow-y-scroll">
-          <div className="flex flex-col bg-white justify-between gap-15 h-fit px-20 py-10">
-            <div className="flex justify-between">
+          <div className="flex flex-col bg-white justify-between gap-5 xs:gap-15 h-fit px-5 xs:px-20 xs:py-10 py-5">
+            <div className="flex xs:flex-row flex-col gap-2 justify-between">
               <label htmlFor="productName">Name</label>
-              <div className="w-4/5">
+              <div className="xs:w-4/5 px-3 xs:px-0">
                 <Input
                   type="text"
                   className="w-full"
                   {...register("productName", { required: "Name is required" })}
                 />
-                {errors.name && (
-                  <p className="text-red-500 text-sm">{errors.name.message}</p>
+                {errors.productName && (
+                  <p className="text-red-500 text-sm">{errors.productName.message}</p>
                 )}
               </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex xs:flex-row flex-col gap-2 justify-between">
               <label htmlFor="description">Description</label>
-              <div className=" w-4/5 ">
+              <div className=" xs:w-4/5 xs:px-0 px-3">
                 <textarea
                   className="bg-gray-100 w-full resize-none px-2 py-1"
                   rows={6}
@@ -265,9 +265,9 @@ const AddProduct = ({
                 )}
               </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex xs:flex-row flex-col gap-2 justify-between">
               <label htmlFor="description">Category</label>
-              <div className="flex flex-col items-center gap-2 w-4/5">
+              <div className="flex flex-col items-center gap-2 xs:w-4/5 px-3 xs:px-0">
                 <div className="relative w-full">
                   <select
                     className={`appearance-none focus:outline-none px-2 focus:ring-2 bg-gray-100 p-2 rounded-lg w-full`}
@@ -318,9 +318,9 @@ const AddProduct = ({
                 </div>
               </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex xs:flex-row flex-col gap-2 justify-between">
               <label>Image</label>
-              <div className="w-4/5">
+              <div className="xs:w-4/5 xs:px-0 px-3">
                 <div className="border-2 w-full h-18 border-dashed">
                   <label
                     htmlFor="image"
@@ -366,27 +366,27 @@ const AddProduct = ({
                 )}
               </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex xs:flex-row flex-col gap-2 justify-between">
               <label htmlFor="price">Price</label>
-              <div className="w-4/5">
+              <div className="xs:w-4/5 px-3 xs:px-0">
                 <Input
                   className="w-full"
                   type="number"
-                  {...register("price", { required: "price is required" })}
+                  {...register("price", { required: "Price is required" })}
                 />
                 {errors.price && (
                   <p className="text-red-500 text-sm">{errors.price.message}</p>
                 )}
               </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex xs:flex-row flex-col gap-2 justify-between">
               <label htmlFor="quantity">Quantity</label>
-              <div className="w-4/5">
+              <div className="xs:w-4/5 xs:px-0 px-3">
                 <Input
                   className="w-full"
                   type="number"
                   {...register("quantity", {
-                    required: "quantity is required",
+                    required: "Quantity is required",
                   })}
                 />
                 {errors.quantity && (
@@ -397,9 +397,9 @@ const AddProduct = ({
               </div>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex xs:flex-row flex-col gap-2 justify-between">
               <label htmlFor="quantity">Discount</label>
-              <div className="w-4/5">
+              <div className="xs:w-4/5 px-3 xs:px-0">
                 <Input
                   className="w-full"
                   type="number"
@@ -412,7 +412,7 @@ const AddProduct = ({
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-10 p-4 px-20">
+        <div className="flex gap-10 p-4 xs:px-20">
           <Button
             type="button"
             onClick={() => {
