@@ -9,7 +9,7 @@
 
  COPY . .
 
- RUN nmp run build
+ RUN npm run build
 
 # Production stage
 FROM nginx:alpine
