@@ -40,7 +40,7 @@ const router = createBrowserRouter([
 
 function App() {
   const dispatch = useDispatch();
-  const loading = useSelector((state) => state.owner.loading)
+  // const loading = useSelector((state) => state.owner.loading)
 
   useEffect(() => {
     dispatch(checkOwnerAuth())
