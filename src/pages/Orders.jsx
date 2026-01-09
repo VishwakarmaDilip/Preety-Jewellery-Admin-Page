@@ -217,7 +217,6 @@ const Orders = () => {
     };
   };
 
-  // console.log(maxDate);
 
   return (
     <div className="xs:px-8 px-4 py-3">
