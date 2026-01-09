@@ -100,7 +100,7 @@ const Home = () => {
         </div>
       )}
       {/* Page title */}
-      <h1 className="font-bold text-2xl mb-4 xs:mb-0">Dashboarda</h1>
+      <h1 className="font-bold text-2xl mb-4 xs:mb-0">Dashboardaa</h1>
       <div className="p-2 xs:p-5 flex flex-col gap-12">
         {/* Analytic */}
         <div className="flex flex-col gap-4">
