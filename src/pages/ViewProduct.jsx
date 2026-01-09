@@ -40,6 +40,7 @@ const ViewProduct = () => {
 
     fetchProduct();
   }, [productId, refresh]);
+  
 
   const handleDeleteProduct = async () => {
     confirm(`Are Sure You Want to Delete ${product?.productName}`) &&
