@@ -126,7 +126,7 @@ const ViewOrder = () => {
               <div className="flex items-center gap-2">
                 <div className="w-20 h-20 bg-gray-400">
                   <img
-                    src={item.product?.image[0]}
+                    src={item.product?.image?.[0]}
                     alt=""
                     className="h-full w-full"
                   />
