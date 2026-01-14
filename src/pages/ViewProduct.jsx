@@ -18,7 +18,7 @@ const ViewProduct = () => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `https://api.devbydilip.cloud/api/v1/product/getProduct/${productId}`,
+          `http://localhost:3000/api/v1/product/getProduct/${productId}`,
           {
             method: "GET",
             credentials: "include",
@@ -46,7 +46,7 @@ const ViewProduct = () => {
     confirm(`Are Sure You Want to Delete ${product?.productName}`) &&
       setLoading(true) &
         fetch(
-          `https://api.devbydilip.cloud/api/v1/product/deleteProduct/${productId}`,
+          `http://localhost:3000/api/v1/product/deleteProduct/${productId}`,
           {
             method: "DELETE",
             credentials: "include",

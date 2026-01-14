@@ -41,7 +41,7 @@ const Products = () => {
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `https://api.devbydilip.cloud/api/v1/product/getProducts?query=${searchTerm}&page=${page}&sortBy=${sortBy}&sortType=${sortType}&category=${categoryId}`,
+            `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}&page=${page}&sortBy=${sortBy}&sortType=${sortType}&category=${categoryId}`,
             {
               method: "GET",
               credentials: "include",
@@ -78,7 +78,7 @@ const Products = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `https://api.devbydilip.cloud/api/v1/product/category/getCategories`,
+          `http://localhost:3000/api/v1/product/category/getCategories`,
           {
             credentials: "include",
           }
@@ -115,7 +115,7 @@ const Products = () => {
 
   const handleDeleteProduct = async (id) => {
     confirm("Are you sure you want to delete this product?") &&
-      fetch(`https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`, {
+      fetch(`http://localhost:3000/api/v1/product/deleteProduct/${id}`, {
         method: "DELETE",
         credentials: "include",
       })
@@ -146,7 +146,7 @@ const Products = () => {
     confirm("Are you sure you want to delete selected products?") &&
       selectedProductIds.forEach((id) => {
         fetch(
-          `https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`,
+          `http://localhost:3000/api/v1/product/deleteProduct/${id}`,
           {
             method: "DELETE",
             credentials: "include",
