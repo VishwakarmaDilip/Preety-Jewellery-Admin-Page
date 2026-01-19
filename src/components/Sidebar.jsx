@@ -36,7 +36,7 @@ const Sidebar = () => {
     >
       <div className="flex flex-col gap-7">
         <div className="flex items-center gap-4">
-          <h1 className="font-bold text-xl text-[#967203]">Preety Jewellery</h1>
+          <h1 className="font-bold text-xl text-[#967203]">Preety Adornment</h1>
           <Icon.ChevronLeft
             onClick={(e) => handleSidebar()}
             className="rounded-full hover:bg-gray-200"
