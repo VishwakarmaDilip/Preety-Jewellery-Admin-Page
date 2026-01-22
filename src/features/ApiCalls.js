@@ -9,7 +9,7 @@ export const fetchOrders = createAsyncThunk(
         try {
             const { searchTerm, page, startDate, endDate, orderStatus, paymentType } = query
 
-            const response = await fetch(`http://localhost:3000/api/v1/order/getAllOrders?query=${searchTerm}&page=${page}&startDate=${startDate}&endDate=${endDate}&orderStatus=${orderStatus}&paymentType=${paymentType}`, {
+            const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/getAllOrders?query=${searchTerm}&page=${page}&startDate=${startDate}&endDate=${endDate}&orderStatus=${orderStatus}&paymentType=${paymentType}`, {
                 credentials: "include"
             })
 
@@ -33,7 +33,7 @@ export const fetchSummary = createAsyncThunk(
     "orders/fetchSummary",
     async (_, thunkAPI) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/order/getRevenueAndOrders`, {
+            const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/getRevenueAndOrders`, {
                 credentials: "include"
             })
 
@@ -51,7 +51,7 @@ export const getOrder = createAsyncThunk(
     "orders/getOrder",
     async(order_id, thunkAPI) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/order/getOrder/${order_id}`, {
+            const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/getOrder/${order_id}`, {
                 credentials: "include"
             })
 
@@ -73,7 +73,7 @@ export const cancelTheOrder = createAsyncThunk(
      "orders/cancelOrder",
     async(order_id, thunkAPI) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/order/cancelOrder/${order_id}`, {
+            const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/cancelOrder/${order_id}`, {
                 method: "POST",
                 credentials: "include"
             })
@@ -94,7 +94,7 @@ export const checkOwnerAuth = createAsyncThunk(
     async (_, thunkAPI) => {
         try {
             const response = await fetch(
-                `http://localhost:3000/api/v1/owner/me`,
+                `https://api.devbydilip.cloud/api/v1/owner/me`,
                 {
                     credentials: "include",
                 }

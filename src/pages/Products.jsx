@@ -41,11 +41,11 @@ const Products = () => {
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/v1/product/getProducts?query=${searchTerm}&page=${page}&sortBy=${sortBy}&sortType=${sortType}&category=${categoryId}`,
+            `https://api.devbydilip.cloud/api/v1/product/getProducts?query=${searchTerm}&page=${page}&sortBy=${sortBy}&sortType=${sortType}&category=${categoryId}`,
             {
               method: "GET",
               credentials: "include",
-            }
+            },
           );
 
           const responseData = await response.json();
@@ -53,7 +53,7 @@ const Products = () => {
             (product) => ({
               ...product,
               selected: false, // Initialize selected state for each product
-            })
+            }),
           );
           const pageData = responseData.data.pageInfo;
 
@@ -78,10 +78,10 @@ const Products = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/v1/product/category/getCategories`,
+          `https://api.devbydilip.cloud/api/v1/product/category/getCategories`,
           {
             credentials: "include",
-          }
+          },
         );
 
         const responseData = await response.json();
@@ -115,7 +115,7 @@ const Products = () => {
 
   const handleDeleteProduct = async (id) => {
     confirm("Are you sure you want to delete this product?") &&
-      fetch(`http://localhost:3000/api/v1/product/deleteProduct/${id}`, {
+      fetch(`https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`, {
         method: "DELETE",
         credentials: "include",
       })
@@ -146,11 +146,11 @@ const Products = () => {
     confirm("Are you sure you want to delete selected products?") &&
       selectedProductIds.forEach((id) => {
         fetch(
-          `http://localhost:3000/api/v1/product/deleteProduct/${id}`,
+          `https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`,
           {
             method: "DELETE",
             credentials: "include",
-          }
+          },
         )
           .then((response) => {
             if (response.ok) {
@@ -187,13 +187,15 @@ const Products = () => {
     const newValue = !selectAll;
     setSelectAll(newValue);
     setProducts(
-      products.map((product) => ({ ...product, selected: newValue }))
+      products.map((product) => ({ ...product, selected: newValue })),
     );
   };
 
   const handleSelectItem = (id) => {
     const updatedProducts = products?.map((product) =>
-      product._id === id ? { ...product, selected: !product.selected } : product
+      product._id === id
+        ? { ...product, selected: !product.selected }
+        : product,
     );
     setProducts(updatedProducts);
     setSelectAll(updatedProducts.every((p) => p.selected));
@@ -429,7 +431,11 @@ const Products = () => {
                       <p>₹{product?.price}</p>
                     </li>
                     <li>
-                      <p>{product?.quantity}</p>
+                      <p
+                        className={`${product?.quantity <= 7 && "text-red-500"}`}
+                      >
+                        {product?.quantity}
+                      </p>
                     </li>
                     <li>
                       <NavLink to={`/products/${product?._id}`}>
@@ -568,10 +574,16 @@ const Products = () => {
                         <div className="flex flex-col justify-center items-center font-bold text-xl">
                           <p>₹{product?.price}</p>
 
-                          <div className="flex gap-1">
-                            <p>Stock :</p>
-                            <p>{product?.quantity}</p>
-                          </div>
+                          {product?.quantity < 1 ? (
+                            <div className="text-red-500 text-base">Out of Stock</div>
+                          ) : (
+                            <div
+                              className={`flex gap-1 ${product?.quantity <= 5 && "text-red-500"}`}
+                            >
+                              <p>Stock :</p>
+                              <p>{product?.quantity}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
 

@@ -13,12 +13,13 @@ const ViewProduct = () => {
   const [loading, setLoading] = useState(false);
   const [AddProductPage, setAddProductPage] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [productID, setProductID] = useState(productId);  
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/v1/product/getProduct/${productId}`,
+          `https://api.devbydilip.cloud/api/v1/product/getProduct/${productID}`,
           {
             method: "GET",
             credentials: "include",
@@ -46,7 +47,7 @@ const ViewProduct = () => {
     confirm(`Are Sure You Want to Delete ${product?.productName}`) &&
       setLoading(true) &
         fetch(
-          `http://localhost:3000/api/v1/product/deleteProduct/${productId}`,
+          `https://api.devbydilip.cloud/api/v1/product/deleteProduct/${productId}`,
           {
             method: "DELETE",
             credentials: "include",
@@ -83,6 +84,7 @@ const ViewProduct = () => {
           productId={productId}
           setRefresh={setRefresh}
           refresh={refresh}
+          setProductId={setProductID}
         />
       </div>
       {/*Product image */}
@@ -130,7 +132,15 @@ const ViewProduct = () => {
         </div>
         <div>
           <p className="text-gray-400 text-xs">Stock</p>
-          <p className="text-base">{product?.quantity}</p>
+          {
+            product?.quantity < 1 ? (
+              <p className="text-base text-red-500">Out of Stock</p>
+            ) : (
+              <p className={`text-base ${product?.quantity <= 5 && "text-red-500"}`}>
+                {product?.quantity}
+              </p>
+            )
+          }
         </div>
         <div>
           <p className="text-gray-400 text-xs">Category</p>
