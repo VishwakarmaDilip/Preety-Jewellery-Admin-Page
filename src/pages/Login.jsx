@@ -34,11 +34,11 @@ const Login = () => {
         body: JSON.stringify(data),
       });
 
-      if (response.status < 300){
+      if (response.status < 300) {
         reset();
-      toast.success("Logged In");
-      dispatch(checkOwnerAuth())
-      navigate("/");
+        toast.success("Logged In");
+        dispatch(checkOwnerAuth());
+        navigate("/");
       } else {
         toast.error("Invalid credentials or something went wrong");
       }

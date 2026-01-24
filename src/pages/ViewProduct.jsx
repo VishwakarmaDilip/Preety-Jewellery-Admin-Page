@@ -13,6 +13,7 @@ const ViewProduct = () => {
   const [loading, setLoading] = useState(false);
   const [AddProductPage, setAddProductPage] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [productID, setProductID] = useState(null);  
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -80,9 +81,10 @@ const ViewProduct = () => {
       >
         <AddProduct
           toggleAddPage={toggleAddPage}
-          productId={productId}
+          productId={productID}
           setRefresh={setRefresh}
           refresh={refresh}
+          setProductId={setProductID}
         />
       </div>
       {/*Product image */}
@@ -130,7 +132,15 @@ const ViewProduct = () => {
         </div>
         <div>
           <p className="text-gray-400 text-xs">Stock</p>
-          <p className="text-base">{product?.quantity}</p>
+          {
+            product?.quantity < 1 ? (
+              <p className="text-base text-red-500">Out of Stock</p>
+            ) : (
+              <p className={`text-base ${product?.quantity <= 5 && "text-red-500"}`}>
+                {product?.quantity}
+              </p>
+            )
+          }
         </div>
         <div>
           <p className="text-gray-400 text-xs">Category</p>
@@ -144,7 +154,9 @@ const ViewProduct = () => {
         {/* buttons */}
         <div className="flex gap-5 col-start-1 col-end-3 mt-2 xs:mt-0">
           <Button
-            onClick={() => toggleAddPage()}
+            onClick={() => {toggleAddPage()
+            setProductID(productId)
+            }}
             className="bg-blue-400 w-1/2 hover:bg-blue-500 active:bg-blue-600"
           >
             Edit
