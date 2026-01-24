@@ -23,7 +23,6 @@ const AddProduct = ({
   const [newCategory, setNewCategory] = React.useState("");
   const [selectedFiles, setSelectedFiles] = React.useState([]);
   const [adding, setAdding] = React.useState(false);
-  const [productID, setProductID] = useState(productId || null)
 
   // Fetch categories from the API
   useEffect(() => {

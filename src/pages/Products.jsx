@@ -431,11 +431,17 @@ const Products = () => {
                       <p>₹{product?.price}</p>
                     </li>
                     <li>
-                      <p
-                        className={`${product?.quantity <= 7 && "text-red-500"}`}
-                      >
-                        {product?.quantity}
-                      </p>
+                      {product?.quantity < 1 ? (
+                        <div className="text-red-500 text-base font-semibold">
+                          Out of Stock
+                        </div>
+                      ) : (
+                        <p
+                          className={`${product?.quantity <= 5 && "text-red-500"}`}
+                        >
+                          {product?.quantity}
+                        </p>
+                      )}
                     </li>
                     <li>
                       <NavLink to={`/products/${product?._id}`}>
@@ -575,7 +581,9 @@ const Products = () => {
                           <p>₹{product?.price}</p>
 
                           {product?.quantity < 1 ? (
-                            <div className="text-red-500 text-base">Out of Stock</div>
+                            <div className="text-red-500 text-base">
+                              Out of Stock
+                            </div>
                           ) : (
                             <div
                               className={`flex gap-1 ${product?.quantity <= 5 && "text-red-500"}`}
@@ -603,16 +611,29 @@ const Products = () => {
                             <p>Edit</p>
                           </div>
 
-                          <div
-                            className="bg-red-700 text-white font-semibold w-1/2 rounded-lg flex items-center justify-center gap-2 "
-                            onClick={() => handleDeleteProduct(product?._id)}
-                          >
-                            <Icon.Trash2
-                              size={20}
-                              className="hover:text-red-600"
-                            />
-                            <p>Delete</p>
-                          </div>
+                          {product?.status === "Enable" ? (
+                            <div
+                              className="bg-red-700 text-white font-semibold w-1/2 rounded-lg flex items-center justify-center gap-2 "
+                              // onClick={() => handleDeleteProduct(product?._id)}
+                            >
+                              <Icon2.CircleOff
+                                size={20}
+                                className="hover:text-red-600"
+                              />
+                              <p>Disable</p>
+                            </div>
+                          ) : (
+                            <div
+                              className="bg-green-700 text-white font-semibold w-1/2 rounded-lg flex items-center justify-center gap-2 "
+                              // onClick={() => handleDeleteProduct(product?._id)}
+                            >
+                              <Icon2.Circle
+                                size={20}
+                                className="hover:text-red-600"
+                              />
+                              <p>Enable</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
