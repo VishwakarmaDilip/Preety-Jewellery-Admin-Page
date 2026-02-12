@@ -8,6 +8,8 @@ import AddProduct from "../components/AddProduct";
 import { sharedContext } from "../components/Layout";
 import { NavLink } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { productStatus } from "../features/ApiCalls";
 
 const Products = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -26,6 +28,8 @@ const Products = () => {
   const [sortType, setSortType] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [filterBox, setFilterBox] = useState(false);
+
+  const dispatch = useDispatch();
 
   // Fetch products from the API
   useEffect(() => {
@@ -113,28 +117,28 @@ const Products = () => {
     }
   };
 
-  const handleDeleteProduct = async (id) => {
-    confirm("Are you sure you want to delete this product?") &&
-      fetch(`https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      })
-        .then((response) => {
-          if (response.ok) {
-            setProducts(products.filter((product) => product._id !== id));
-            toast.success("Product deleted successfully");
-          } else {
-            toast.error("Failed to delete product");
-          }
-        })
-        .catch((error) => {
-          console.error("Error deleting product:", error);
-          toast.error("An error occurred while deleting the product");
-        })
-        .finally(() => {
-          setRefresh(!refresh);
-        });
-  };
+  // const handleDeleteProduct = async (id) => {
+  //   confirm("Are you sure you want to delete this product?") &&
+  //     fetch(`https://api.devbydilip.cloud/api/v1/product/deleteProduct/${id}`, {
+  //       method: "DELETE",
+  //       credentials: "include",
+  //     })
+  //       .then((response) => {
+  //         if (response.ok) {
+  //           setProducts(products.filter((product) => product._id !== id));
+  //           toast.success("Product deleted successfully");
+  //         } else {
+  //           toast.error("Failed to delete product");
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error deleting product:", error);
+  //         toast.error("An error occurred while deleting the product");
+  //       })
+  //       .finally(() => {
+  //         setRefresh(!refresh);
+  //       });
+  // };
 
   const handleBulkDelete = () => {
     const selectedProductIds = products
@@ -202,6 +206,19 @@ const Products = () => {
   };
 
   document.body.style.overflow = AddProductPage ? "hidden" : "auto";
+
+  const handleProductStatus = async (id) => {
+    try {
+      const status = await dispatch(productStatus(id)).unwrap();
+      setRefresh((prev) => !prev);
+
+      toast.success(
+        `Product ${status.data.status === "Enable" ? "Enabled" : "Disabled"} successfully`,
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="xs:px-8 py-3 px-4">
@@ -457,11 +474,19 @@ const Products = () => {
                         size={20}
                         className="hover:text-green-500"
                       />
-                      <Icon.Trash2
-                        size={20}
-                        onClick={() => handleDeleteProduct(product?._id)}
-                        className="hover:text-red-600"
-                      />
+                      {product?.status === "Enable" ? (
+                        <Icon2.CircleOff
+                          size={20}
+                          onClick={() => handleProductStatus(product?._id)}
+                          className="hover:text-red-600"
+                        />
+                      ) : (
+                        <Icon2.CircleCheck
+                          size={20}
+                          className="hover:text-blue-600"
+                          onClick={() => handleProductStatus(product?._id)}
+                        />
+                      )}
                     </li>
                   </ul>
                 ))
@@ -551,12 +576,17 @@ const Products = () => {
                         <div className="flex gap-2">
                           {/* image box */}
                           <NavLink to={`/products/${product?._id}`}>
-                            <div className="w-24 h-24">
+                            <div className="w-24 h-24 relative">
                               <img
                                 src={product?.image[0]}
                                 alt=""
                                 className="h-full"
                               />
+                              {product?.status === "Disable" && (
+                                <div className="absolute top-0 left-0 w-full h-full bg-black/50 text-2xl text-red-500 font-bold flex justify-center items-center">
+                                  <p>Disabled</p>
+                                </div>
+                              )}
                             </div>
                           </NavLink>
 
@@ -614,7 +644,7 @@ const Products = () => {
                           {product?.status === "Enable" ? (
                             <div
                               className="bg-red-700 text-white font-semibold w-1/2 rounded-lg flex items-center justify-center gap-2 "
-                              // onClick={() => handleDeleteProduct(product?._id)}
+                              onClick={() => handleProductStatus(product?._id)}
                             >
                               <Icon2.CircleOff
                                 size={20}
@@ -625,7 +655,7 @@ const Products = () => {
                           ) : (
                             <div
                               className="bg-green-700 text-white font-semibold w-1/2 rounded-lg flex items-center justify-center gap-2 "
-                              // onClick={() => handleDeleteProduct(product?._id)}
+                              onClick={() => handleProductStatus(product?._id)}
                             >
                               <Icon2.Circle
                                 size={20}

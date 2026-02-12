@@ -116,4 +116,29 @@ export const checkOwnerAuth = createAsyncThunk(
     }
 ) 
 
+
+// Product related api calls
+
+export const productStatus = createAsyncThunk(
+    "product/productStatus",
+    async (product_id, thunkAPI) => {
+        try {
+            const response = await fetch(`https://api.devbydilip.cloud/api/v1/product/productStatus/${product_id}`, {
+                method: "PATCH",
+                credentials: "include"
+            })
+
+            if (!response.ok) {
+                throw new Error("Failed to disable product");
+            }
+
+            const responseData = await response.json()
+            return responseData
+        } catch (error) {
+            console.error("Failed to disable product", error);
+            return thunkAPI.rejectWithValue("Failed to disable product");
+        }
+    }
+)
+
    
