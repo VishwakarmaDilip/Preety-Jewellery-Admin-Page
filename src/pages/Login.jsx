@@ -25,7 +25,7 @@ const Login = () => {
 
   const submit = async (data) => {
     try {
-      const response = await fetch(`https://api.devbydilip.cloud/api/v1/owner/login`, {
+      const response = await fetch(`http://localhost:3000/api/v1/owner/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
