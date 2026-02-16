@@ -11,6 +11,7 @@ import Invoice from "./pages/Invoice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkOwnerAuth } from "./features/ApiCalls";
+import Category from "./pages/Category.page";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
           { path: "/products/:productId", element: <ViewProduct /> },
           { path: "/orders", element: <Orders /> },
           { path: "/orders/:orderId", element: <ViewOrder /> },
+          {path: "/categories", element: <Category/>},
         ],
       },
       { path: "/invoice/:orderId", element: <Invoice /> },

@@ -30,7 +30,7 @@ const AddProduct = ({
       const fetchProduct = async () => {
         try {
           const response = await fetch(
-            `http://localhost:3000/api/v1/product/getProduct/${productId}`,
+            `https://api.devbydilip.cloud/api/v1/product/getProduct/${productId}`,
             {
               method: "GET",
               credentials: "include",
@@ -60,7 +60,7 @@ const AddProduct = ({
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/v1/product/category/getCategories`,
+          `https://api.devbydilip.cloud/api/v1/product/category/getCategories`,
           {
             credentials: "include",
           }
@@ -81,7 +81,7 @@ const AddProduct = ({
   const creatCategory = async (category) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/v1/product/category/createCategory",
+        "https://api.devbydilip.cloud/api/v1/product/category/createCategory",
         {
           method: "POST",
           headers: {
@@ -153,7 +153,7 @@ const AddProduct = ({
     setAdding(true);
 
     if (!productId) {
-      fetch("http://localhost:3000/api/v1/product/createProduct", {
+      fetch("https://api.devbydilip.cloud/api/v1/product/createProduct", {
         method: "POST",
         body: formData,
         credentials: "include",
@@ -182,7 +182,7 @@ const AddProduct = ({
     } else {
       formData.append("previousImages", imagePreviews);
 
-      fetch(`http://localhost:3000/api/v1/product/updateProduct/${productId}`, {
+      fetch(`https://api.devbydilip.cloud/api/v1/product/updateProduct/${productId}`, {
         method: "PATCH",
         body: formData,
         credentials: "include",

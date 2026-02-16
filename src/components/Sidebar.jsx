@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import * as Icon from "react-feather";
+import * as Icon2 from "lucide-react";
 import { sharedContext } from "./Layout";
 import Button from "./Button";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -18,7 +19,7 @@ const Sidebar = () => {
   };
   const handleLogout = () => {
     try {
-      fetch(`http://localhost:3000/api/v1/owner/logout`, {
+      fetch(`https://api.devbydilip.cloud/api/v1/owner/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -75,7 +76,7 @@ const Sidebar = () => {
             </li>
             <li>
               <NavLink
-                to={"/Orders"}
+                to={"/orders"}
                 onClick={() => handleMobileSidebar()}
                 className={({ isActive }) =>
                   isActive
@@ -85,6 +86,20 @@ const Sidebar = () => {
               >
                 <Icon.Package size={18} />
                 <span className="font-semibold">Orders</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={"/categories"}
+                onClick={() => handleMobileSidebar()}
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-theme flex items-center gap-2 mt-5"
+                    : "text-gray-500 flex items-center gap-2 mt-5"
+                }
+              >
+                <Icon2.Component size={18} />
+                <span className="font-semibold">Categories</span>
               </NavLink>
             </li>
           </ul>
