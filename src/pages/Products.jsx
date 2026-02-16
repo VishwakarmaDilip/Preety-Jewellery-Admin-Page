@@ -91,7 +91,7 @@ const Products = () => {
         const responseData = await response.json();
         const allCategories = responseData.data;
 
-        setCategory(allCategories);  
+        setCategory(allCategories);
       } catch (error) {
         console.log("Error fetching categories:", error);
       }
