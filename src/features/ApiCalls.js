@@ -14,7 +14,7 @@ export const fetchOrders = createAsyncThunk(
             })
 
             const responseData = await response.json()
-            
+
             const fetchOrders = responseData?.data?.fetchedOrders
             const pageInfo = responseData?.data?.pageInfo
             thunkAPI.dispatch(setOrders(fetchOrders))
@@ -49,7 +49,7 @@ export const fetchSummary = createAsyncThunk(
 
 export const getOrder = createAsyncThunk(
     "orders/getOrder",
-    async(order_id, thunkAPI) => {
+    async (order_id, thunkAPI) => {
         try {
             const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/getOrder/${order_id}`, {
                 credentials: "include"
@@ -61,7 +61,7 @@ export const getOrder = createAsyncThunk(
             // thunkAPI.dispatch(setOneOrder(fetchedOrder))
 
             return fetchedOrder
-            
+
         } catch (error) {
             console.error("Failed to fetch", error);
             return thunkAPI.rejectWithValue("Failed to fetch");
@@ -70,8 +70,8 @@ export const getOrder = createAsyncThunk(
 )
 
 export const cancelTheOrder = createAsyncThunk(
-     "orders/cancelOrder",
-    async(order_id, thunkAPI) => {
+    "orders/cancelOrder",
+    async (order_id, thunkAPI) => {
         try {
             const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/cancelOrder/${order_id}`, {
                 method: "POST",
@@ -84,7 +84,7 @@ export const cancelTheOrder = createAsyncThunk(
             }
         } catch (error) {
             console.error("Failed to cancel", error);
-            return thunkAPI.rejectWithValue("Failed to cancel"); 
+            return thunkAPI.rejectWithValue("Failed to cancel");
         }
     }
 )
@@ -114,8 +114,7 @@ export const checkOwnerAuth = createAsyncThunk(
             return thunkAPI.rejectWithValue("Failed to check user auth");
         }
     }
-) 
-
+)
 
 // Product related api calls
 
@@ -141,4 +140,40 @@ export const productStatus = createAsyncThunk(
     }
 )
 
-   
+export const getCategories = createAsyncThunk(
+    "product/getCategories",
+    async (_, thunkAPI) => {
+        try {
+            const response = await fetch('https://api.devbydilip.cloud/api/product/category/getCategories', {
+                credentials: "include"
+            })
+
+            if (!response.ok) {
+                throw new Error("Failed to Get Categories")
+            }
+
+            const responseData = await response.json()
+            const categories = responseData.data
+            return categories
+
+        } catch (error) {
+            console.error("Failed to fetch categories", error);
+            return thunkAPI.rejectWithValue("Failed to fetch categories");
+        }
+    }
+)
+
+export const deleteCategory = createAsyncThunk(
+    "product/deleteCategory",
+    async (categoryId, thunkAPI) => {
+        try {
+            const response = await fetch(`https://api.devbydilip.cloud/api/product/category/deleteCategory`, {
+                method: "DELETE",
+                credentials: "include"
+            })
+        } catch (error) {
+            console.error("Failed to Delete Category", error);
+            return thunkAPI.rejectWithValue("Failed To Delete Category")
+        }
+    }
+)

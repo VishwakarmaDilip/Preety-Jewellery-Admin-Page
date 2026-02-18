@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { productStatus } from "./ApiCalls"
+import { getCategories, productStatus } from "./ApiCalls"
 
 
 const initialState = {
-
+    categories : []
 }
 
 export const productSlice = createSlice({
@@ -14,5 +14,10 @@ export const productSlice = createSlice({
             .addCase(productStatus.fulfilled, (state, action)=> {
 
             })
+            .addCase(getCategories.fulfilled, (state,action) => {
+                state.categories = action.payload                
+            })
     }
 })
+
+export default productSlice.reducer
