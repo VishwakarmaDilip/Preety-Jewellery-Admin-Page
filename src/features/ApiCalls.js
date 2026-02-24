@@ -144,7 +144,7 @@ export const getCategories = createAsyncThunk(
     "product/getCategories",
     async (_, thunkAPI) => {
         try {
-            const response = await fetch('https://api.devbydilip.cloud/api/product/category/getCategories', {
+            const response = await fetch('https://api.devbydilip.cloud/api/v1/product/category/getCategories', {
                 credentials: "include"
             })
 
@@ -166,11 +166,22 @@ export const getCategories = createAsyncThunk(
 export const deleteCategory = createAsyncThunk(
     "product/deleteCategory",
     async (categoryId, thunkAPI) => {
-        try {
-            const response = await fetch(`https://api.devbydilip.cloud/api/product/category/deleteCategory`, {
+    try {
+            const response = await fetch(`https://api.devbydilip.cloud/api/v1/product/category/deleteCategory`, {
                 method: "DELETE",
-                credentials: "include"
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ categoryId })
             })
+
+            const data = response.json()
+            if (!response.ok) {
+                return thunkAPI.rejectWithValue(data?.messege || "Delete failed");
+            }
+
+            return data
         } catch (error) {
             console.error("Failed to Delete Category", error);
             return thunkAPI.rejectWithValue("Failed To Delete Category")

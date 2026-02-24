@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { getCategories, productStatus } from "./ApiCalls"
+import { deleteCategory, getCategories, productStatus } from "./ApiCalls"
 
 
 const initialState = {
-    categories : []
+    categories : [],
+    catLoad: false
 }
 
 export const productSlice = createSlice({
@@ -11,11 +12,14 @@ export const productSlice = createSlice({
     initialState,
     extraReducers: (builder) => {
         builder
-            .addCase(productStatus.fulfilled, (state, action)=> {
-
-            })
             .addCase(getCategories.fulfilled, (state,action) => {
-                state.categories = action.payload                
+                state.categories = action.payload              
+            })
+            .addCase(deleteCategory.pending, (state, payload) => {
+                state.catLoad = true
+            })
+            .addCase(deleteCategory.fulfilled, (state, payload) => {
+                state.catLoad = false
             })
     }
 })
