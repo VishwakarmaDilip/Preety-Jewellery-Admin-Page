@@ -116,6 +116,34 @@ export const checkOwnerAuth = createAsyncThunk(
     }
 )
 
+export const updateStatus = createAsyncThunk(
+    "order/updateStatus",
+    async ({status, order_id}, thunkApi) => {
+        try {
+            const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/updateStatus`, {
+                method:"PATCH",
+                credentials:"include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({status,order_id})
+            })
+
+            const data = await response.json()
+
+            if(!response.ok) {
+                return thunkAPI.rejectWithValue(data?.messege || "Something went wrong");
+            }
+            return data
+        } catch (error) {
+            console.error("something went wrong", error);
+            return thunkAPI.rejectWithValue("something went wrong")    
+        }
+    }
+)
+
+
+
 // Product related api calls
 
 export const productStatus = createAsyncThunk(

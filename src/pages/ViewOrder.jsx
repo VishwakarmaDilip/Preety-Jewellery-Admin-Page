@@ -2,16 +2,17 @@ import * as Icon from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useParams } from "react-router-dom";
-import { cancelTheOrder, getOrder } from "../features/ApiCalls";
+import { cancelTheOrder, getOrder, updateStatus } from "../features/ApiCalls";
 import Button from "../components/Button";
 import toast from "react-hot-toast";
 
 const ViewOrder = () => {
   const order_id = useParams();
   const dispatch = useDispatch();
-  const [refresh, setRefresh] = useState(false);
+
   const fetchedOrder = useSelector((state) => state.order.oneOrder);
   const isReload = useSelector((state) => state.order.reload);
+
   const [actionBar, setActionBar] = useState(false);
 
   const option = {
@@ -26,15 +27,17 @@ const ViewOrder = () => {
 
   const orderDate = fetchedOrder?.createdAt
     ? new Intl.DateTimeFormat("en-IN", option).format(
-        new Date(fetchedOrder?.createdAt)
+        new Date(fetchedOrder?.createdAt),
       )
     : "";
 
-  const acceptOrder = () => {};
+  const handleUpdateStatus = (status, order_id) => {
+    dispatch(updateStatus({ status, order_id }));
+  };
 
   const cancelOrder = () => {
     const isCancellationAllowed = confirm(
-      "Are you sure you want to cancel this order?"
+      "Are you sure you want to cancel this order?",
     );
 
     if (isCancellationAllowed) {
@@ -202,27 +205,60 @@ const ViewOrder = () => {
       <div className=" h-10 mt-2 flex gap-4">
         <Button
           className={
-            fetchedOrder?.status === "Cancelled"
+            fetchedOrder?.status === "Cancelled" ||
+            fetchedOrder?.status === "Delivered"
               ? `bg-gray-400 w-1/2`
               : `bg-red-700 w-1/2 hover:bg-red-800 active:bg-red-900`
           }
-          disabled={fetchedOrder?.status != "Cancelled" ? false : true}
+          disabled={
+            fetchedOrder?.status != "Cancelled" &&
+            fetchedOrder?.status != "Delivered"
+              ? false
+              : true
+          }
           onClick={() => {
             cancelOrder(order_id);
           }}
         >
           Cancel
         </Button>
-        <Button
-          className={
-            fetchedOrder?.status === "Cancelled"
-              ? `bg-gray-400 w-1/2`
-              : "bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"
-          }
-          disabled={fetchedOrder?.status != "Cancelled" ? false : true}
-        >
-          Accept
-        </Button>
+        {!(fetchedOrder?.status === "Shipping") ? (
+          <Button
+            className={
+              fetchedOrder?.status === "Cancelled" ||
+              fetchedOrder?.status === "Delivered"
+                ? `bg-gray-400 w-1/2`
+                : "bg-green-500 hover:bg-green-600 active:bg-green-700 w-1/2"
+            }
+            disabled={
+              fetchedOrder?.status != "Cancelled" &&
+              fetchedOrder?.status != "Delivered"
+                ? false
+                : true
+            }
+            onClick={() => {
+              handleUpdateStatus("Shipping", fetchedOrder?._id);
+              toast.success("Order Accepted");
+            }}
+          >
+            Accept
+          </Button>
+        ) : (
+          <Button
+            className={
+              fetchedOrder?.status === "Cancelled"
+                ? `bg-gray-400 w-1/2`
+                : "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 w-1/2"
+            }
+            disabled={fetchedOrder?.status != "Cancelled" ? false : true}
+            onClick={() => {
+              handleUpdateStatus("Delivered", fetchedOrder?._id);
+              toast.success("Marked Delivered");
+            }}
+          >
+            Mark Delevered
+          </Button>
+        )}
       </div>
 
       {screen.width < 500 && (
