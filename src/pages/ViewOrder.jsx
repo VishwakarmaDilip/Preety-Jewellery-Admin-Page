@@ -31,6 +31,14 @@ const ViewOrder = () => {
       )
     : "";
 
+  let deliveryDate;
+  if(fetchedOrder?.status === "Delivered") {
+    deliveryDate = fetchedOrder?.updatedAt
+    ? new Intl.DateTimeFormat("en-IN", option).format(
+      new Date(fetchedOrder?.updatedAt)
+    ) : "";
+  }
+
   const handleUpdateStatus = (status, order_id) => {
     dispatch(updateStatus({ status, order_id }));
   };
@@ -105,10 +113,20 @@ const ViewOrder = () => {
               </p>
             </div>
             {fetchedOrder?.status != "Cancelled" ? (
-              <div className="flex gap-1 font-semibold text-sm xs:text-base text-green-500">
-                <Icon.Truck className="size-5 xs:size-6" />
-                <p>Estimated Delivery :</p>
-                <p>{fetchedOrder?.delivery}</p>
+              <div className="text-green-500 font-semibold">
+                {fetchedOrder?.status != "Delivered" ? (
+                  <div className="flex gap-1 text-sm xs:text-base">
+                    <Icon.Truck className="size-5 xs:size-6" />
+                    <p>Estimated Delivery :</p>
+                    <p>{fetchedOrder?.delivery}</p>
+                  </div>
+                ) : (
+                  <div className="flex gap-1 text-sm xs:text-base">
+                    <Icon.Truck className="size-5 xs:size-6" />
+                    <p>Delivered On</p>
+                    <p>{deliveryDate}</p>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-red-400 font-bold bg-red-100 px-4 rounded-full flex justify-center">
@@ -190,7 +208,10 @@ const ViewOrder = () => {
               <h3 className="text-lg font-semibold">Delivery</h3>
               <p className="pl-2">
                 {fetchedOrder?.address?.[0]?.firstName}{" "}
-                {fetchedOrder?.address?.[0]?.lastName}
+                {fetchedOrder?.address?.[0]?.lastName},
+              </p>
+              <p className="pl-2">
+                {fetchedOrder?.address?.[0]?.mobile},
               </p>
               <p className="pl-2">
                 {fetchedOrder?.address?.[0]?.address},{" "}
