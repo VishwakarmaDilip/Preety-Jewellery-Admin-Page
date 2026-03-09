@@ -74,7 +74,7 @@ export const cancelTheOrder = createAsyncThunk(
     async (order_id, thunkAPI) => {
         try {
             const response = await fetch(`https://api.devbydilip.cloud/api/v1/order/cancelOrder/${order_id}`, {
-                method: "POST",
+                method: "PATCH",
                 credentials: "include"
             })
             if (response.status < 399) {
