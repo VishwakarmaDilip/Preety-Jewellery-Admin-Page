@@ -32,11 +32,12 @@ const ViewOrder = () => {
     : "";
 
   let deliveryDate;
-  if(fetchedOrder?.status === "Delivered") {
+  if (fetchedOrder?.status === "Delivered") {
     deliveryDate = fetchedOrder?.updatedAt
-    ? new Intl.DateTimeFormat("en-IN", option).format(
-      new Date(fetchedOrder?.updatedAt)
-    ) : "";
+      ? new Intl.DateTimeFormat("en-IN", option).format(
+          new Date(fetchedOrder?.updatedAt),
+        )
+      : "";
   }
 
   const handleUpdateStatus = (status, order_id) => {
@@ -50,7 +51,6 @@ const ViewOrder = () => {
 
     if (isCancellationAllowed) {
       dispatch(cancelTheOrder(order_id.orderId));
-      setRefresh((prev) => !prev);
     } else {
       toast.error("Order cancellation aborted");
     }
@@ -68,7 +68,11 @@ const ViewOrder = () => {
           <div className="flex justify-between items-center">
             {/* ID */}
             <h1 className="text-xl xs:text-3xl font-bold">
-              Order ID :<span> {fetchedOrder?.orderId}</span>
+              Order ID :
+              <span>
+                {fetchedOrder?.orderId}
+                {/* {`${data}`} */}
+              </span>
             </h1>
 
             {/* invoice and trackOrder */}
@@ -210,9 +214,7 @@ const ViewOrder = () => {
                 {fetchedOrder?.address?.[0]?.firstName}{" "}
                 {fetchedOrder?.address?.[0]?.lastName},
               </p>
-              <p className="pl-2">
-                {fetchedOrder?.address?.[0]?.mobile},
-              </p>
+              <p className="pl-2">{fetchedOrder?.address?.[0]?.mobile},</p>
               <p className="pl-2">
                 {fetchedOrder?.address?.[0]?.address},{" "}
                 {fetchedOrder?.address?.[0]?.city} -{" "}

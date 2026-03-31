@@ -437,6 +437,7 @@ const AddProduct = ({
           <Button
             type="submit"
             disabled={adding}
+            onClick={()=> refresh()}
             className={
               adding
                 ? "bg-gray-400 w-xl"
